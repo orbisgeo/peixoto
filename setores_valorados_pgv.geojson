@@ -43,24 +43,44 @@
           {
             "id": 10,
             "tipo": "Lote Vago",
+            "valor": 400000,
+            "area": 735,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 400000,
             "vu": 544.2176870748299,
             "status": "Base Referência"
           },
           {
             "id": 6,
             "tipo": "Lote Vago",
+            "valor": 250000,
+            "area": 595,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 250000,
             "vu": 420.16806722689074,
             "status": "Base Referência"
           },
           {
             "id": 84,
             "tipo": "Lote Vago",
+            "valor": 650000,
+            "area": 625,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 650000,
             "vu": 1040,
             "status": "Base Referência"
           },
           {
             "id": 151,
             "tipo": "Outros",
+            "valor": 400000,
+            "area": 735,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 400000,
             "vu": 544.2176870748299,
             "status": "Validada por Zona"
           }
@@ -1602,6 +1622,11 @@
           {
             "id": 95,
             "tipo": "Lote Vago",
+            "valor": 450000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 450000,
             "vu": 750,
             "status": "Base Referência"
           }
@@ -1815,108 +1840,198 @@
           {
             "id": 11,
             "tipo": "Residencial",
+            "valor": 350000,
+            "area": 240,
+            "area_contr": 150,
+            "custo_construcao": 290658.6,
+            "valor_residual": 59341.40000000002,
             "vu": 247.25583333333344,
             "status": "Validada por Zona"
           },
           {
             "id": 4,
             "tipo": "Residencial",
+            "valor": 440000,
+            "area": 330,
+            "area_contr": 75,
+            "custo_construcao": 145329.3,
+            "valor_residual": 294670.7,
             "vu": 892.9415151515152,
             "status": "Validada por Zona"
           },
           {
             "id": 35,
             "tipo": "Residencial",
+            "valor": 600000,
+            "area": 432,
+            "area_contr": 230,
+            "custo_construcao": 445676.51999999996,
+            "valor_residual": 154323.48000000004,
             "vu": 357.23027777777787,
             "status": "Validada por Zona"
           },
           {
             "id": 36,
             "tipo": "Residencial",
+            "valor": 280000,
+            "area": 112,
+            "area_contr": 68,
+            "custo_construcao": 131765.232,
+            "valor_residual": 148234.768,
             "vu": 1323.5247142857145,
             "status": "Validada por Zona"
           },
           {
             "id": 39,
             "tipo": "Residencial",
+            "valor": 500000,
+            "area": 360,
+            "area_contr": 223,
+            "custo_construcao": 432112.452,
+            "valor_residual": 67887.54800000001,
             "vu": 188.57652222222225,
             "status": "Validada por Zona"
           },
           {
             "id": 40,
             "tipo": "Comercial",
+            "valor": 650000,
+            "area": 300,
+            "area_contr": 300,
+            "custo_construcao": 581317.2,
+            "valor_residual": 68682.80000000005,
             "vu": 228.9426666666668,
             "status": "Validada por Zona"
           },
           {
             "id": 44,
             "tipo": "Lote Vago",
+            "valor": 750000,
+            "area": 280,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 750000,
             "vu": 2678.5714285714284,
             "status": "Base Referência"
           },
           {
             "id": 45,
             "tipo": "Residencial",
+            "valor": 750000,
+            "area": 280,
+            "area_contr": 115,
+            "custo_construcao": 222838.25999999998,
+            "valor_residual": 527161.74,
             "vu": 1882.7205,
             "status": "Validada por Zona"
           },
           {
             "id": 46,
             "tipo": "Residencial",
+            "valor": 400000,
+            "area": 253,
+            "area_contr": 160,
+            "custo_construcao": 310035.84,
+            "valor_residual": 89964.15999999997,
             "vu": 355.5895652173912,
             "status": "Validada por Zona"
           },
           {
             "id": 50,
             "tipo": "Residencial",
+            "valor": 170000,
+            "area": 312.5,
+            "area_contr": 60,
+            "custo_construcao": 116263.43999999999,
+            "valor_residual": 53736.56000000001,
             "vu": 171.95699200000004,
             "status": "Validada por Zona"
           },
           {
             "id": 51,
             "tipo": "Residencial",
+            "valor": 180000,
+            "area": 264,
+            "area_contr": 90,
+            "custo_construcao": 174395.15999999997,
+            "valor_residual": 5604.840000000026,
             "vu": 21.23045454545464,
             "status": "Validada por Zona"
           },
           {
             "id": 57,
             "tipo": "Comercial",
+            "valor": 240000,
+            "area": 120,
+            "area_contr": 62,
+            "custo_construcao": 120138.888,
+            "valor_residual": 119861.112,
             "vu": 998.8426,
             "status": "Validada por Zona"
           },
           {
             "id": 73,
             "tipo": "Residencial",
+            "valor": 250000,
+            "area": 312,
+            "area_contr": 120,
+            "custo_construcao": 232526.87999999998,
+            "valor_residual": 17473.120000000024,
             "vu": 56.00358974358982,
             "status": "Validada por Zona"
           },
           {
             "id": 71,
             "tipo": "Lote Vago",
+            "valor": 110000,
+            "area": 200,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 110000,
             "vu": 550,
             "status": "Base Referência"
           },
           {
             "id": 82,
             "tipo": "Residencial",
+            "valor": 500000,
+            "area": 253,
+            "area_contr": 160,
+            "custo_construcao": 310035.84,
+            "valor_residual": 189964.15999999997,
             "vu": 750.8464822134387,
             "status": "Validada por Zona"
           },
           {
             "id": 76,
             "tipo": "Residencial",
+            "valor": 300000,
+            "area": 100,
+            "area_contr": 100,
+            "custo_construcao": 193772.4,
+            "valor_residual": 106227.6,
             "vu": 1062.276,
             "status": "Validada por Zona"
           },
           {
             "id": 99,
             "tipo": "Comercial",
+            "valor": 300000,
+            "area": 240,
+            "area_contr": 145,
+            "custo_construcao": 280969.98,
+            "valor_residual": 19030.02000000002,
             "vu": 79.29175000000008,
             "status": "Validada por Zona"
           },
           {
             "id": 98,
             "tipo": "Lote Vago",
+            "valor": 120000,
+            "area": 210,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 120000,
             "vu": 571.4285714285714,
             "status": "Base Referência"
           }
@@ -3109,42 +3224,77 @@
           {
             "id": 8,
             "tipo": "Lote Vago",
+            "valor": 200000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 200000,
             "vu": 333.3333333333333,
             "status": "Base Referência"
           },
           {
             "id": 9,
             "tipo": "Lote Vago",
+            "valor": 250000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 250000,
             "vu": 416.6666666666667,
             "status": "Base Referência"
           },
           {
             "id": 12,
             "tipo": "Lote Vago",
+            "valor": 120000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 120000,
             "vu": 200,
             "status": "Base Referência"
           },
           {
             "id": 16,
             "tipo": "Lote Vago",
+            "valor": 150000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 150000,
             "vu": 250,
             "status": "Base Referência"
           },
           {
             "id": 18,
             "tipo": "Lote Vago",
+            "valor": 280000,
+            "area": 640,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 280000,
             "vu": 437.5,
             "status": "Base Referência"
           },
           {
             "id": 17,
             "tipo": "Residencial",
+            "valor": 350000,
+            "area": 300,
+            "area_contr": 100,
+            "custo_construcao": 193772.4,
+            "valor_residual": 156227.6,
             "vu": 520.7586666666667,
             "status": "Validada por Zona"
           },
           {
             "id": 60,
             "tipo": "Lote Vago",
+            "valor": 450000,
+            "area": 512,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 450000,
             "vu": 878.90625,
             "status": "Base Referência"
           }
@@ -3280,108 +3430,198 @@
           {
             "id": 13,
             "tipo": "Lote Vago",
+            "valor": 100000,
+            "area": 300,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 100000,
             "vu": 333.3333333333333,
             "status": "Base Referência"
           },
           {
             "id": 15,
             "tipo": "Lote Vago",
+            "valor": 130000,
+            "area": 400,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 130000,
             "vu": 325,
             "status": "Base Referência"
           },
           {
             "id": 20,
             "tipo": "Lote Vago",
+            "valor": 45000,
+            "area": 360,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 45000,
             "vu": 125,
             "status": "Base Referência"
           },
           {
             "id": 21,
             "tipo": "Lote Vago",
+            "valor": 55000,
+            "area": 360,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 55000,
             "vu": 152.77777777777777,
             "status": "Base Referência"
           },
           {
             "id": 23,
             "tipo": "Lote Vago",
+            "valor": 70000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 70000,
             "vu": 116.66666666666667,
             "status": "Base Referência"
           },
           {
             "id": 52,
             "tipo": "Lote Vago",
+            "valor": 200000,
+            "area": 400,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 200000,
             "vu": 500,
             "status": "Base Referência"
           },
           {
             "id": 53,
             "tipo": "Residencial",
+            "valor": 420000,
+            "area": 420,
+            "area_contr": 74,
+            "custo_construcao": 143391.576,
+            "valor_residual": 276608.424,
             "vu": 658.5914857142857,
             "status": "Validada por Zona"
           },
           {
             "id": 54,
             "tipo": "Lote Vago",
+            "valor": 300000,
+            "area": 110,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 300000,
             "vu": 2727.2727272727275,
             "status": "Base Referência"
           },
           {
             "id": 25,
             "tipo": "Residencial",
+            "valor": 1500000,
+            "area": 735.34,
+            "area_contr": 334.15,
+            "custo_construcao": 647490.4746,
+            "valor_residual": 852509.5254,
             "vu": 1159.3406116898307,
             "status": "Validada por Zona"
           },
           {
             "id": 28,
             "tipo": "Residencial",
+            "valor": 350000,
+            "area": 640,
+            "area_contr": 115,
+            "custo_construcao": 222838.25999999998,
+            "valor_residual": 127161.74000000002,
             "vu": 198.69021875000004,
             "status": "Validada por Zona"
           },
           {
             "id": 29,
             "tipo": "Lote Vago",
+            "valor": 120000,
+            "area": 900,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 120000,
             "vu": 133.33333333333334,
             "status": "Base Referência"
           },
           {
             "id": 33,
             "tipo": "Residencial",
+            "valor": 450000,
+            "area": 690,
+            "area_contr": 60,
+            "custo_construcao": 116263.43999999999,
+            "valor_residual": 333736.56,
             "vu": 483.6761739130435,
             "status": "Validada por Zona"
           },
           {
             "id": 37,
             "tipo": "Residencial",
+            "valor": 350000,
+            "area": 450,
+            "area_contr": 90,
+            "custo_construcao": 174395.15999999997,
+            "valor_residual": 175604.84000000003,
             "vu": 390.2329777777778,
             "status": "Validada por Zona"
           },
           {
             "id": 48,
             "tipo": "Lote Vago",
+            "valor": 150000,
+            "area": 360,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 150000,
             "vu": 416.6666666666667,
             "status": "Base Referência"
           },
           {
             "id": 61,
             "tipo": "Lote Vago",
+            "valor": 500000,
+            "area": 960,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 500000,
             "vu": 520.8333333333334,
             "status": "Base Referência"
           },
           {
             "id": 66,
             "tipo": "Residencial",
+            "valor": 650000,
+            "area": 403,
+            "area_contr": 264,
+            "custo_construcao": 511559.13599999994,
+            "valor_residual": 138440.86400000006,
             "vu": 343.52571712158823,
             "status": "Validada por Zona"
           },
           {
             "id": 65,
             "tipo": "Residencial",
+            "valor": 350000,
+            "area": 270,
+            "area_contr": 140,
+            "custo_construcao": 271281.36,
+            "valor_residual": 78718.64000000001,
             "vu": 291.5505185185186,
             "status": "Validada por Zona"
           },
           {
             "id": 69,
             "tipo": "Residencial",
+            "valor": 230000,
+            "area": 180,
+            "area_contr": 60,
+            "custo_construcao": 116263.43999999999,
+            "valor_residual": 113736.56000000001,
             "vu": 631.8697777777778,
             "status": "Validada por Zona"
           }
@@ -4305,6 +4545,11 @@
           {
             "id": 91,
             "tipo": "Lote Vago",
+            "valor": 120000,
+            "area": 300,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 120000,
             "vu": 400,
             "status": "Base Referência"
           }
@@ -4403,6 +4648,11 @@
           {
             "id": 97,
             "tipo": "Lote Vago",
+            "valor": 200000,
+            "area": 480,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 200000,
             "vu": 416.6666666666667,
             "status": "Base Referência"
           }
@@ -5029,36 +5279,66 @@
           {
             "id": 135,
             "tipo": "Lote Vago",
+            "valor": 70000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 70000,
             "vu": 116.66666666666667,
             "status": "Base Referência"
           },
           {
             "id": 102,
             "tipo": "Lote Vago",
+            "valor": 90000,
+            "area": 375,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 90000,
             "vu": 240,
             "status": "Base Referência"
           },
           {
             "id": 104,
             "tipo": "Lote Vago",
+            "valor": 200000,
+            "area": 675,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 200000,
             "vu": 296.2962962962963,
             "status": "Base Referência"
           },
           {
             "id": 114,
             "tipo": "Lote Vago",
+            "valor": 50000,
+            "area": 367.5,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 50000,
             "vu": 136.05442176870747,
             "status": "Base Referência"
           },
           {
             "id": 126,
             "tipo": "Lote Vago",
+            "valor": 40000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 40000,
             "vu": 88.88888888888889,
             "status": "Base Referência"
           },
           {
             "id": 138,
             "tipo": "Residencial",
+            "valor": 180000,
+            "area": 900,
+            "area_contr": 54,
+            "custo_construcao": 104637.096,
+            "valor_residual": 75362.904,
             "vu": 83.73656,
             "status": "Validada por Zona"
           }
@@ -5584,72 +5864,132 @@
           {
             "id": 27,
             "tipo": "Lote Vago",
+            "valor": 130000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 130000,
             "vu": 216.66666666666666,
             "status": "Base Referência"
           },
           {
             "id": 86,
             "tipo": "Lote Vago",
+            "valor": 35000,
+            "area": 312.5,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 35000,
             "vu": 112,
             "status": "Base Referência"
           },
           {
             "id": 92,
             "tipo": "Lote Vago",
+            "valor": 400000,
+            "area": 1260,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 400000,
             "vu": 317.46031746031747,
             "status": "Base Referência"
           },
           {
             "id": 105,
             "tipo": "Lote Vago",
+            "valor": 40000,
+            "area": 786,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 40000,
             "vu": 50.89058524173028,
             "status": "Base Referência"
           },
           {
             "id": 106,
             "tipo": "Lote Vago",
+            "valor": 75000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 75000,
             "vu": 166.66666666666666,
             "status": "Base Referência"
           },
           {
             "id": 110,
             "tipo": "Lote Vago",
+            "valor": 50000,
+            "area": 375,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 50000,
             "vu": 133.33333333333334,
             "status": "Base Referência"
           },
           {
             "id": 111,
             "tipo": "Lote Vago",
+            "valor": 50000,
+            "area": 300,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 50000,
             "vu": 166.66666666666666,
             "status": "Base Referência"
           },
           {
             "id": 112,
             "tipo": "Lote Vago",
+            "valor": 50000,
+            "area": 300,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 50000,
             "vu": 166.66666666666666,
             "status": "Base Referência"
           },
           {
             "id": 108,
             "tipo": "Lote Vago",
+            "valor": 40000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 40000,
             "vu": 88.88888888888889,
             "status": "Base Referência"
           },
           {
             "id": 117,
             "tipo": "Lote Vago",
+            "valor": 35000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 35000,
             "vu": 77.77777777777777,
             "status": "Base Referência"
           },
           {
             "id": 119,
             "tipo": "Lote Vago",
+            "valor": 60000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 60000,
             "vu": 133.33333333333334,
             "status": "Base Referência"
           },
           {
             "id": 120,
             "tipo": "Lote Vago",
+            "valor": 45000,
+            "area": 300,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 45000,
             "vu": 150,
             "status": "Base Referência"
           }
@@ -5958,54 +6298,99 @@
           {
             "id": 115,
             "tipo": "Lote Vago",
+            "valor": 140000,
+            "area": 375,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 140000,
             "vu": 373.3333333333333,
             "status": "Base Referência"
           },
           {
             "id": 118,
             "tipo": "Lote Vago",
+            "valor": 80000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 80000,
             "vu": 177.77777777777777,
             "status": "Base Referência"
           },
           {
             "id": 121,
             "tipo": "Lote Vago",
+            "valor": 40000,
+            "area": 264,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 40000,
             "vu": 151.5151515151515,
             "status": "Base Referência"
           },
           {
             "id": 123,
             "tipo": "Lote Vago",
+            "valor": 95000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 95000,
             "vu": 211.11111111111111,
             "status": "Base Referência"
           },
           {
             "id": 124,
             "tipo": "Lote Vago",
+            "valor": 30000,
+            "area": 800,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 30000,
             "vu": 37.5,
             "status": "Base Referência"
           },
           {
             "id": 125,
             "tipo": "Lote Vago",
+            "valor": 38000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 38000,
             "vu": 84.44444444444444,
             "status": "Base Referência"
           },
           {
             "id": 130,
             "tipo": "Lote Vago",
+            "valor": 25000,
+            "area": 800,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 25000,
             "vu": 31.25,
             "status": "Base Referência"
           },
           {
             "id": 131,
             "tipo": "Lote Vago",
+            "valor": 20000,
+            "area": 800,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 20000,
             "vu": 25,
             "status": "Base Referência"
           },
           {
             "id": 133,
             "tipo": "Lote Vago",
+            "valor": 30000,
+            "area": 400,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 30000,
             "vu": 75,
             "status": "Base Referência"
           }
@@ -6115,72 +6500,132 @@
           {
             "id": 134,
             "tipo": "Lote Vago",
+            "valor": 35000,
+            "area": 750,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 35000,
             "vu": 46.666666666666664,
             "status": "Base Referência"
           },
           {
             "id": 136,
             "tipo": "Lote Vago",
+            "valor": 25000,
+            "area": 300,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 25000,
             "vu": 83.33333333333333,
             "status": "Base Referência"
           },
           {
             "id": 103,
             "tipo": "Lote Vago",
+            "valor": 80000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 80000,
             "vu": 177.77777777777777,
             "status": "Base Referência"
           },
           {
             "id": 127,
             "tipo": "Lote Vago",
+            "valor": 40000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 40000,
             "vu": 88.88888888888889,
             "status": "Base Referência"
           },
           {
             "id": 140,
             "tipo": "Lote Vago",
+            "valor": 25000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 25000,
             "vu": 55.55555555555556,
             "status": "Base Referência"
           },
           {
             "id": 142,
             "tipo": "Residencial",
+            "valor": 550000,
+            "area": 1350,
+            "area_contr": 200,
+            "custo_construcao": 387544.8,
+            "valor_residual": 162455.2,
             "vu": 120.33718518518519,
             "status": "Validada por Zona"
           },
           {
             "id": 143,
             "tipo": "Lote Vago",
+            "valor": 30000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 30000,
             "vu": 66.66666666666667,
             "status": "Base Referência"
           },
           {
             "id": 144,
             "tipo": "Lote Vago",
+            "valor": 30000,
+            "area": 449,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 30000,
             "vu": 66.815144766147,
             "status": "Base Referência"
           },
           {
             "id": 146,
             "tipo": "Lote Vago",
+            "valor": 35000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 35000,
             "vu": 77.77777777777777,
             "status": "Base Referência"
           },
           {
             "id": 148,
             "tipo": "Lote Vago",
+            "valor": 18000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 18000,
             "vu": 40,
             "status": "Base Referência"
           },
           {
             "id": 150,
             "tipo": "Lote Vago",
+            "valor": 50000,
+            "area": 600,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 50000,
             "vu": 83.33333333333333,
             "status": "Base Referência"
           },
           {
             "id": 152,
             "tipo": "Lote Vago",
+            "valor": 25000,
+            "area": 450,
+            "area_contr": 0,
+            "custo_construcao": 0,
+            "valor_residual": 25000,
             "vu": 55.55555555555556,
             "status": "Base Referência"
           }

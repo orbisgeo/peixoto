@@ -87,6 +87,8 @@ working.features.forEach(feature => {
     const value = properties.valor < 10000 ? properties.valor * 1000 : properties.valor;
     const constructionCost = (properties.area_contr || 0) * 3229.54 * 0.6;
     const landValue = value - constructionCost;
+    properties.custo_construcao = constructionCost;
+    properties.valor_residual = landValue;
     if (landValue <= 0) {
       properties.vu_estimado = 0;
       properties.status_validacao = 'Inválida (Custo > Valor)';
@@ -110,7 +112,7 @@ working.features.forEach(feature => {
   if (properties.status_validacao === 'Base Referência') zone.vagos++;
   if (properties.status_validacao === 'Validada por Zona') zone.validadas++;
   if (properties.vu_estimado) zone.vus.push(properties.vu_estimado);
-  if (properties.vu_estimado) zone.samples.push({ id: properties.id, tipo: properties.tipo_padrao || properties.tipo || 'Outros', vu: properties.vu_estimado, status: properties.status_validacao });
+  if (properties.vu_estimado) zone.samples.push({ id: properties.id, tipo: properties.tipo_padrao || properties.tipo || 'Outros', valor: properties.valor < 10000 ? properties.valor * 1000 : properties.valor, area: properties.area_total, area_contr: properties.area_contr || 0, custo_construcao: properties.custo_construcao || 0, valor_residual: properties.valor_residual ?? (properties.valor < 10000 ? properties.valor * 1000 : properties.valor), vu: properties.vu_estimado, status: properties.status_validacao });
 });
 
 sectors.features.forEach(feature => { if (!aggregation[zoneName(feature)]) aggregation[zoneName(feature)] = { total: 0, vagos: 0, validadas: 0, vus: [], samples: [] }; });

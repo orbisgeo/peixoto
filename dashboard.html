@@ -392,6 +392,8 @@
                     }
 
                     let terraResiduo = val - custoConstrucao;
+                    p.custo_construcao = custoConstrucao;
+                    p.valor_residual = terraResiduo;
 
                     if(terraResiduo <= 0) {
                         p.vu_estimado = 0;
@@ -439,6 +441,11 @@
                         agregacaoZonas[zona].samples.push({
                             id: props.id,
                             tipo: props.tipo_padrao || props.tipo || 'Outros',
+                            valor: props.valor < 10000 ? props.valor * 1000 : props.valor,
+                            area: props.area_total,
+                            area_contr: props.area_contr || 0,
+                            custo_construcao: props.custo_construcao || 0,
+                            valor_residual: props.valor_residual ?? (props.valor < 10000 ? props.valor * 1000 : props.valor),
                             vu: props.vu_estimado,
                             status: status
                         });
