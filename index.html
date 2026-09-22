@@ -32,12 +32,12 @@
         @media print {
             html, body { height: auto !important; overflow: visible !important; }
             body * { visibility: hidden; }
-            #modal-minuta, #modal-minuta * { visibility: visible; }
-            #modal-minuta {
+            #modal-minuta, #modal-minuta *, #modal-relatorio, #modal-relatorio * { visibility: visible; }
+            #modal-minuta, #modal-relatorio {
                 position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0;
                 background: white; height: auto !important; overflow: visible !important;
             }
-            #modal-minuta > div { height: auto !important; overflow: visible !important; }
+            #modal-minuta > div, #modal-relatorio > div { height: auto !important; overflow: visible !important; }
             .juridico-doc { width: 100%; max-width: none; padding: 1.5cm; box-shadow: none; margin: 0; }
             .no-print { display: none !important; }
         }
@@ -64,6 +64,9 @@
             <input type="checkbox" id="toggle-fatores" checked onchange="alternarFatores()" class="accent-emerald-400">
             <span>Usar fatores corretivos</span>
         </label>
+        <button onclick="gerarRelatorio()" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i> Gerar relatório
+        </button>
     </div>
 </nav>
 
@@ -292,6 +295,17 @@
     </div>
 </div>
 
+<!-- Modal Relatório de Avaliação -->
+<div id="modal-relatorio" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-start overflow-y-auto py-10 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-[25cm] shadow-2xl relative mb-10">
+        <div class="no-print absolute top-4 right-4 flex gap-2">
+            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-xs font-bold">IMPRIMIR</button>
+            <button onclick="document.getElementById('modal-relatorio').classList.add('hidden')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded text-xs font-bold">FECHAR</button>
+        </div>
+        <div id="conteudo-relatorio" class="juridico-doc"></div>
+    </div>
+</div>
+
 <script>
     const VALOR_UPFM = 30.90;
     proj4.defs("EPSG:31981", "+proj=utm +zone=21 +south +datum=SIRGAS2000 +units=m +no_defs");
@@ -301,6 +315,8 @@
     let COR_POR_GRUPO = {};
     let LAYERS_POR_GRUPO = {};
     let SETORES = [];
+    let setoresDadosOriginais = null;
+    let bancoAmostras = [];
     let usarFatoresCorretivos = true;
 
     const TABELA_II_EDIF = {
@@ -441,15 +457,117 @@
         return convertido;
     }
 
+    function getRings(geometry) {
+        if (!geometry) return [];
+        if (geometry.type === "Polygon") return [geometry.coordinates[0]];
+        if (geometry.type === "MultiPolygon") return geometry.coordinates.map(polygon => polygon[0]);
+        return [];
+    }
+
+    function pontoDentroPoligono(point, ring) {
+        let inside = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            const xi = ring[i][0], yi = ring[i][1];
+            const xj = ring[j][0], yj = ring[j][1];
+            const cruza = ((yi > point[1]) !== (yj > point[1])) &&
+                (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi);
+            if (cruza) inside = !inside;
+        }
+        return inside;
+    }
+
+    function centroideZona(feature) {
+        const ring = getRings(feature.geometry)[0] || [];
+        if (!ring.length) return null;
+        return ring.reduce((sum, point) => [sum[0] + point[0], sum[1] + point[1]], [0, 0])
+            .map(value => value / ring.length);
+    }
+
+    function prepararBancoAmostras(data) {
+        bancoAmostras = (data?.features || []).map(feature => {
+            const p = feature.properties || {};
+            const tipo = String(p.tipo || "Não informado").trim();
+            const valor = Number(p.valor);
+            const area = Number(p.area_total);
+            const loteVago = /lote\s*vago|terreno\s*vago|terreno/i.test(tipo);
+            const vu = area > 0 && Number.isFinite(valor) ? (valor < 10000 ? valor * 1000 : valor) / area : null;
+            let zona = "Fora das zonas";
+            if (feature.geometry?.coordinates && setoresDadosOriginais) {
+                const match = setoresDadosOriginais.features.find(setor =>
+                    getRings(setor.geometry).some(ring => pontoDentroPoligono(feature.geometry.coordinates, ring)));
+                if (match) zona = extrairNomeGrupo(match.properties || {}) || "Zona desconhecida";
+            }
+            return { id: p.id ?? "-", tipo, valor, area, vu, loteVago, zona, endereco: p.endereco || "Não informado", status: p.status || "Não informado" };
+        });
+    }
+
+    function formatarListaAmostras(amostras) {
+        if (!amostras.length) return "Nenhuma amostra de lote vago foi associada a esta zona.";
+        return amostras.map(amostra => `ID ${amostra.id} (${amostra.tipo}, ${amostra.area.toLocaleString("pt-BR")} m², VU ${fmtMoney(amostra.vu)}/m²)`).join("; ");
+    }
+
+    function gerarRelatorio() {
+        const setores = setoresDadosOriginais?.features || [];
+        const zonas = setores.map(feature => extrairNomeGrupo(feature.properties || {}) || "Zona desconhecida");
+        const porZona = {};
+        bancoAmostras.filter(amostra => amostra.loteVago && Number.isFinite(amostra.vu) && amostra.vu > 0).forEach(amostra => {
+            if (!porZona[amostra.zona]) porZona[amostra.zona] = [];
+            porZona[amostra.zona].push(amostra);
+        });
+        const centros = {};
+        setores.forEach(feature => { centros[extrairNomeGrupo(feature.properties || {})] = centroideZona(feature); });
+        const medianas = {};
+        Object.keys(porZona).forEach(zona => medianas[zona] = calcularMediana(porZona[zona].map(amostra => amostra.vu)));
+        const linhas = zonas.map(zona => {
+            const usadas = porZona[zona] || [];
+            const mediana = medianas[zona];
+            let origem = "Amostras da própria zona";
+            let vizinhas = "Não se aplica";
+            let valor = mediana;
+            if (!Number.isFinite(valor)) {
+                const candidatas = Object.keys(medianas).filter(nome => centros[zona] && centros[nome]);
+                candidatas.sort((a, b) => distancia(centros[zona], centros[a]) - distancia(centros[zona], centros[b]));
+                const usadasVizinhas = candidatas.slice(0, 3);
+                const pesos = usadasVizinhas.map(nome => 1 / Math.pow(Math.max(distancia(centros[zona], centros[nome]), 0.0001), 2));
+                const pesoTotal = pesos.reduce((sum, peso) => sum + peso, 0);
+                if (pesoTotal) valor = usadasVizinhas.reduce((sum, nome, index) => sum + medianas[nome] * pesos[index], 0) / pesoTotal;
+                origem = valor ? "IDW com mediana das zonas adjacentes" : "Sem amostras e sem zona adjacente com dados";
+                vizinhas = usadasVizinhas.length ? usadasVizinhas.join(", ") : "Nenhuma";
+            }
+            return `<tr><td>${zona}</td><td>${usadas.length}</td><td>${formatarListaAmostras(usadas)}</td><td>${Number.isFinite(valor) ? fmtMoney(valor) + "/m²" : "Sem valor"}</td><td>${origem}</td><td>${vizinhas}</td></tr>`;
+        }).join("");
+        const amostrasHtml = bancoAmostras.map(amostra => `<tr><td>${amostra.id}</td><td>${amostra.zona}</td><td>${amostra.tipo}</td><td>${amostra.area ? amostra.area.toLocaleString("pt-BR") : "-"}</td><td>${Number.isFinite(amostra.valor) ? fmtMoney(amostra.valor) : "-"}</td><td>${Number.isFinite(amostra.vu) ? fmtMoney(amostra.vu) + "/m²" : "-"}</td><td>${amostra.status}</td></tr>`).join("");
+        document.getElementById("conteudo-relatorio").innerHTML = `<div class="juridico-header"><h1>RELATÓRIO TÉCNICO DE AVALIAÇÃO</h1><p>Planta Genérica de Valores - Peixoto de Azevedo/MT</p><p>Exercício 2026</p></div>
+            <h2>1. OBJETIVO E BASE DE DADOS</h2><p>Este relatório documenta a metodologia de cálculo dos valores unitários de terreno, a associação das amostras às zonas e o tratamento das zonas sem amostras próprias. Foram utilizadas ${bancoAmostras.length} amostras carregadas do banco amostras2.geojson e ${zonas.length} zonas do arquivo setores_valorados_pgv.geojson.</p>
+            <h2>2. METODOLOGIA</h2><p>O valor unitário de cada zona corresponde à mediana dos valores unitários das amostras de lotes vagos associadas espacialmente à zona. Para cada amostra, o valor unitário foi calculado por VU = valor do imóvel ÷ área do terreno, com conversão de valores inferiores a R$ 10.000,00 para a escala integral em reais.</p><p>Quando uma zona não possui amostras próprias, seu valor é estimado pelo método IDW (Inverse Distance Weighting), usando as medianas das até três zonas com dados mais próximas. A ponderação é inversamente proporcional ao quadrado da distância entre os centroides das zonas.</p><p>Na calculadora, o VVT é obtido por VVT = área tributável × mediana_vu × Kpav × Kd. Quando o toggle de fatores está desligado, a área total e os fatores unitários 1,00 são utilizados. O VVE é calculado pela área construída × valor da Tabela II em UPFM/m² × UPFM vigente de R$ 30,90.</p>
+            <h2>3. RESULTADO POR ZONA</h2><table class="juridico-table"><thead><tr><th>Zona</th><th>Amostras usadas</th><th>Quais amostras</th><th>Valor adotado</th><th>Origem</th><th>Zonas adjacentes usadas</th></tr></thead><tbody>${linhas}</tbody></table>
+            <h2>4. BANCO COMPLETO DE AMOSTRAS</h2><table class="juridico-table"><thead><tr><th>ID</th><th>Zona</th><th>Tipo</th><th>Área (m²)</th><th>Valor</th><th>VU calculado</th><th>Status</th></tr></thead><tbody>${amostrasHtml}</tbody></table>`;
+        document.getElementById("modal-relatorio").classList.remove("hidden");
+    }
+
+    function calcularMediana(valores) {
+        const ordenados = [...valores].sort((a, b) => a - b);
+        const meio = Math.floor(ordenados.length / 2);
+        return ordenados.length % 2 ? ordenados[meio] : (ordenados[meio - 1] + ordenados[meio]) / 2;
+    }
+
+    function distancia(a, b) {
+        return Math.hypot(a[0] - b[0], a[1] - b[1]);
+    }
+
     function initMap() {
         mapa = L.map("mapa-setores").setView([-10.51, -55.45], 11);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "\u00a9 OpenStreetMap contributors"
         }).addTo(mapa);
 
-        fetch("setores_valorados_pgv.geojson")
-            .then(r => { if (!r.ok) throw new Error("GeoJSON indisponível"); return r.json(); })
-            .then(data => {
+        Promise.all([
+            fetch("setores_valorados_pgv.geojson").then(r => { if (!r.ok) throw new Error("GeoJSON de setores indisponível"); return r.json(); }),
+            fetch("amostras2.geojson").then(r => { if (!r.ok) throw new Error("Banco de amostras indisponível"); return r.json(); })
+        ])
+            .then(([data, amostras]) => {
+                setoresDadosOriginais = data;
+                prepararBancoAmostras(amostras);
                 processarSetoresGeoJSON(normalizarGeoJSONParaMapa(data));
             })
             .catch(err => {
