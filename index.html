@@ -317,6 +317,7 @@
     let SETORES = [];
     let setoresDadosOriginais = null;
     let bancoAmostras = [];
+    let dadosValorizacaoPorZona = {};
     let usarFatoresCorretivos = true;
 
     const TABELA_II_EDIF = {
@@ -389,6 +390,11 @@
         });
 
         const nomesEncontrados = Object.keys(mapaSetoresMap);
+        dadosValorizacaoPorZona = {};
+        data.features.forEach(feature => {
+            const nome = extrairNomeGrupo(feature.properties || {});
+            if (nome) dadosValorizacaoPorZona[nome] = feature.properties || {};
+        });
         SETORES = nomesEncontrados.map((nome, idx) => {
             const feature = data.features.find(f => (extrairNomeGrupo(f.properties || {}) || `Setor ${idx + 1}`) === nome);
             const medianaVU = Number(feature?.properties?.mediana_vu);
@@ -517,30 +523,31 @@
         const centros = {};
         setores.forEach(feature => { centros[extrairNomeGrupo(feature.properties || {})] = centroideZona(feature); });
         const medianas = {};
-        Object.keys(porZona).forEach(zona => medianas[zona] = calcularMediana(porZona[zona].map(amostra => amostra.vu)));
+        Object.keys(dadosValorizacaoPorZona).forEach(zona => {
+            const valor = Number(dadosValorizacaoPorZona[zona].mediana_vu);
+            if (Number.isFinite(valor)) medianas[zona] = valor;
+        });
         const linhas = zonas.map(zona => {
             const usadas = porZona[zona] || [];
-            const mediana = medianas[zona];
-            let origem = "Amostras da própria zona";
+            const dadosOficiais = dadosValorizacaoPorZona[zona] || {};
+            const mediana = Number(dadosOficiais.mediana_vu);
+            const quantidadeOficial = Number(dadosOficiais.lotes_vagos) || 0;
+            let origem = dadosOficiais.metodo_val === "IDW" ? "IDW com mediana das zonas adjacentes" : "Mediana direta da valoração oficial";
             let vizinhas = "Não se aplica";
             let valor = mediana;
-            if (!Number.isFinite(valor)) {
+            if (dadosOficiais.metodo_val === "IDW") {
                 const candidatas = Object.keys(medianas).filter(nome => centros[zona] && centros[nome]);
                 candidatas.sort((a, b) => distancia(centros[zona], centros[a]) - distancia(centros[zona], centros[b]));
                 const usadasVizinhas = candidatas.slice(0, 3);
-                const pesos = usadasVizinhas.map(nome => 1 / Math.pow(Math.max(distancia(centros[zona], centros[nome]), 0.0001), 2));
-                const pesoTotal = pesos.reduce((sum, peso) => sum + peso, 0);
-                if (pesoTotal) valor = usadasVizinhas.reduce((sum, nome, index) => sum + medianas[nome] * pesos[index], 0) / pesoTotal;
-                origem = valor ? "IDW com mediana das zonas adjacentes" : "Sem amostras e sem zona adjacente com dados";
                 vizinhas = usadasVizinhas.length ? usadasVizinhas.join(", ") : "Nenhuma";
             }
-            return `<tr><td>${zona}</td><td>${usadas.length}</td><td>${formatarListaAmostras(usadas)}</td><td>${Number.isFinite(valor) ? fmtMoney(valor) + "/m²" : "Sem valor"}</td><td>${origem}</td><td>${vizinhas}</td></tr>`;
+            return `<tr><td>${zona}</td><td>${quantidadeOficial}</td><td>${formatarListaAmostras(usadas)}</td><td>${Number.isFinite(valor) ? fmtMoney(valor) + "/m²" : "Sem valor"}</td><td>${origem}</td><td>${vizinhas}</td></tr>`;
         }).join("");
         const amostrasHtml = bancoAmostras.map(amostra => `<tr><td>${amostra.id}</td><td>${amostra.zona}</td><td>${amostra.tipo}</td><td>${amostra.area ? amostra.area.toLocaleString("pt-BR") : "-"}</td><td>${Number.isFinite(amostra.valor) ? fmtMoney(amostra.valor) : "-"}</td><td>${Number.isFinite(amostra.vu) ? fmtMoney(amostra.vu) + "/m²" : "-"}</td><td>${amostra.status}</td></tr>`).join("");
         document.getElementById("conteudo-relatorio").innerHTML = `<div class="juridico-header"><h1>RELATÓRIO TÉCNICO DE AVALIAÇÃO</h1><p>Planta Genérica de Valores - Peixoto de Azevedo/MT</p><p>Exercício 2026</p></div>
             <h2>1. OBJETIVO E BASE DE DADOS</h2><p>Este relatório documenta a metodologia de cálculo dos valores unitários de terreno, a associação das amostras às zonas e o tratamento das zonas sem amostras próprias. Foram utilizadas ${bancoAmostras.length} amostras carregadas do banco amostras2.geojson e ${zonas.length} zonas do arquivo setores_valorados_pgv.geojson.</p>
-            <h2>2. METODOLOGIA</h2><p>O valor unitário de cada zona corresponde à mediana dos valores unitários das amostras de lotes vagos associadas espacialmente à zona. Para cada amostra, o valor unitário foi calculado por VU = valor do imóvel ÷ área do terreno, com conversão de valores inferiores a R$ 10.000,00 para a escala integral em reais.</p><p>Quando uma zona não possui amostras próprias, seu valor é estimado pelo método IDW (Inverse Distance Weighting), usando as medianas das até três zonas com dados mais próximas. A ponderação é inversamente proporcional ao quadrado da distância entre os centroides das zonas.</p><p>Na calculadora, o VVT é obtido por VVT = área tributável × mediana_vu × Kpav × Kd. Quando o toggle de fatores está desligado, a área total e os fatores unitários 1,00 são utilizados. O VVE é calculado pela área construída × valor da Tabela II em UPFM/m² × UPFM vigente de R$ 30,90.</p>
-            <h2>3. RESULTADO POR ZONA</h2><table class="juridico-table"><thead><tr><th>Zona</th><th>Amostras usadas</th><th>Quais amostras</th><th>Valor adotado</th><th>Origem</th><th>Zonas adjacentes usadas</th></tr></thead><tbody>${linhas}</tbody></table>
+            <h2>2. METODOLOGIA</h2><p>O relatório reproduz a valoração oficial já carregada pela aplicação no arquivo setores_valorados_pgv.geojson. Para cada zona, o valor adotado é o campo mediana_vu, e a origem é o campo metodo_val. Os campos lotes_vagos, total_validas e edif_validadas documentam a composição da valoração oficial.</p><p>As amostras do banco amostras2.geojson são associadas espacialmente às zonas para documentação e conferência. O VU de referência de cada registro é apresentado como valor do imóvel ÷ área do terreno, com conversão de valores inferiores a R$ 10.000,00 para a escala integral em reais; essa associação não substitui o mediana_vu oficial.</p><p>Nas zonas cujo metodo_val é IDW, o relatório lista as zonas adjacentes com dados que integram a estimativa oficial. Na calculadora, o VVT é obtido por VVT = área tributável × mediana_vu × Kpav × Kd. Quando o toggle de fatores está desligado, a área total e os fatores unitários 1,00 são utilizados. O VVE é calculado pela área construída × valor da Tabela II em UPFM/m² × UPFM vigente de R$ 30,90.</p>
+            <h2>3. RESULTADO POR ZONA</h2><table class="juridico-table"><thead><tr><th>Zona</th><th>Amostras oficiais</th><th>Amostras associadas para conferência</th><th>Valor oficial adotado</th><th>Origem</th><th>Zonas adjacentes usadas</th></tr></thead><tbody>${linhas}</tbody></table>
             <h2>4. BANCO COMPLETO DE AMOSTRAS</h2><table class="juridico-table"><thead><tr><th>ID</th><th>Zona</th><th>Tipo</th><th>Área (m²)</th><th>Valor</th><th>VU calculado</th><th>Status</th></tr></thead><tbody>${amostrasHtml}</tbody></table>`;
         document.getElementById("modal-relatorio").classList.remove("hidden");
     }
