@@ -1,6 +1,6 @@
 {
   "type": "FeatureCollection",
-  "name": "setores2209_unificado_por_zona",
+  "name": "setores_valorados_pgv",
   "crs": {
     "type": "name",
     "properties": {
@@ -32,7 +32,40 @@
         "lotes_vagos": 3,
         "edif_validadas": 1,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          10,
+          6,
+          84,
+          151
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 10,
+            "tipo": "Lote Vago",
+            "vu": 544.2176870748299,
+            "status": "Base Referência"
+          },
+          {
+            "id": 6,
+            "tipo": "Lote Vago",
+            "vu": 420.16806722689074,
+            "status": "Base Referência"
+          },
+          {
+            "id": 84,
+            "tipo": "Lote Vago",
+            "vu": 1040,
+            "status": "Base Referência"
+          },
+          {
+            "id": 151,
+            "tipo": "Outros",
+            "vu": 544.2176870748299,
+            "status": "Validada por Zona"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -1458,7 +1491,22 @@
         "lotes_vagos": 0,
         "edif_validadas": 0,
         "imputado_idw": true,
-        "metodo_val": "IDW"
+        "metodo_val": "IDW",
+        "amostras_oficiais_ids": [],
+        "amostras_oficiais_detalhes": [],
+        "zonas_idw_usadas": [
+          "ZONA 06",
+          "ZONA 01",
+          "ZONA 05",
+          "ZONA 04",
+          "ZONA 12",
+          "ZONA 14",
+          "ZONA 11",
+          "ZONA 08",
+          "ZONA 03",
+          "ZONA 09",
+          "ZONA 13"
+        ]
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1546,7 +1594,19 @@
         "lotes_vagos": 1,
         "edif_validadas": 0,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          95
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 95,
+            "tipo": "Lote Vago",
+            "vu": 750,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1730,7 +1790,138 @@
         "lotes_vagos": 3,
         "edif_validadas": 15,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          11,
+          4,
+          35,
+          36,
+          39,
+          40,
+          44,
+          45,
+          46,
+          50,
+          51,
+          57,
+          73,
+          71,
+          82,
+          76,
+          99,
+          98
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 11,
+            "tipo": "Residencial",
+            "vu": 247.25583333333344,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 4,
+            "tipo": "Residencial",
+            "vu": 892.9415151515152,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 35,
+            "tipo": "Residencial",
+            "vu": 357.23027777777787,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 36,
+            "tipo": "Residencial",
+            "vu": 1323.5247142857145,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 39,
+            "tipo": "Residencial",
+            "vu": 188.57652222222225,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 40,
+            "tipo": "Comercial",
+            "vu": 228.9426666666668,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 44,
+            "tipo": "Lote Vago",
+            "vu": 2678.5714285714284,
+            "status": "Base Referência"
+          },
+          {
+            "id": 45,
+            "tipo": "Residencial",
+            "vu": 1882.7205,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 46,
+            "tipo": "Residencial",
+            "vu": 355.5895652173912,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 50,
+            "tipo": "Residencial",
+            "vu": 171.95699200000004,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 51,
+            "tipo": "Residencial",
+            "vu": 21.23045454545464,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 57,
+            "tipo": "Comercial",
+            "vu": 998.8426,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 73,
+            "tipo": "Residencial",
+            "vu": 56.00358974358982,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 71,
+            "tipo": "Lote Vago",
+            "vu": 550,
+            "status": "Base Referência"
+          },
+          {
+            "id": 82,
+            "tipo": "Residencial",
+            "vu": 750.8464822134387,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 76,
+            "tipo": "Residencial",
+            "vu": 1062.276,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 99,
+            "tipo": "Comercial",
+            "vu": 79.29175000000008,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 98,
+            "tipo": "Lote Vago",
+            "vu": 571.4285714285714,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -2904,7 +3095,61 @@
         "lotes_vagos": 6,
         "edif_validadas": 1,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          8,
+          9,
+          12,
+          16,
+          18,
+          17,
+          60
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 8,
+            "tipo": "Lote Vago",
+            "vu": 333.3333333333333,
+            "status": "Base Referência"
+          },
+          {
+            "id": 9,
+            "tipo": "Lote Vago",
+            "vu": 416.6666666666667,
+            "status": "Base Referência"
+          },
+          {
+            "id": 12,
+            "tipo": "Lote Vago",
+            "vu": 200,
+            "status": "Base Referência"
+          },
+          {
+            "id": 16,
+            "tipo": "Lote Vago",
+            "vu": 250,
+            "status": "Base Referência"
+          },
+          {
+            "id": 18,
+            "tipo": "Lote Vago",
+            "vu": 437.5,
+            "status": "Base Referência"
+          },
+          {
+            "id": 17,
+            "tipo": "Residencial",
+            "vu": 520.7586666666667,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 60,
+            "tipo": "Lote Vago",
+            "vu": 878.90625,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -3010,7 +3255,138 @@
         "lotes_vagos": 10,
         "edif_validadas": 8,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          13,
+          15,
+          20,
+          21,
+          23,
+          52,
+          53,
+          54,
+          25,
+          28,
+          29,
+          33,
+          37,
+          48,
+          61,
+          66,
+          65,
+          69
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 13,
+            "tipo": "Lote Vago",
+            "vu": 333.3333333333333,
+            "status": "Base Referência"
+          },
+          {
+            "id": 15,
+            "tipo": "Lote Vago",
+            "vu": 325,
+            "status": "Base Referência"
+          },
+          {
+            "id": 20,
+            "tipo": "Lote Vago",
+            "vu": 125,
+            "status": "Base Referência"
+          },
+          {
+            "id": 21,
+            "tipo": "Lote Vago",
+            "vu": 152.77777777777777,
+            "status": "Base Referência"
+          },
+          {
+            "id": 23,
+            "tipo": "Lote Vago",
+            "vu": 116.66666666666667,
+            "status": "Base Referência"
+          },
+          {
+            "id": 52,
+            "tipo": "Lote Vago",
+            "vu": 500,
+            "status": "Base Referência"
+          },
+          {
+            "id": 53,
+            "tipo": "Residencial",
+            "vu": 658.5914857142857,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 54,
+            "tipo": "Lote Vago",
+            "vu": 2727.2727272727275,
+            "status": "Base Referência"
+          },
+          {
+            "id": 25,
+            "tipo": "Residencial",
+            "vu": 1159.3406116898307,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 28,
+            "tipo": "Residencial",
+            "vu": 198.69021875000004,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 29,
+            "tipo": "Lote Vago",
+            "vu": 133.33333333333334,
+            "status": "Base Referência"
+          },
+          {
+            "id": 33,
+            "tipo": "Residencial",
+            "vu": 483.6761739130435,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 37,
+            "tipo": "Residencial",
+            "vu": 390.2329777777778,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 48,
+            "tipo": "Lote Vago",
+            "vu": 416.6666666666667,
+            "status": "Base Referência"
+          },
+          {
+            "id": 61,
+            "tipo": "Lote Vago",
+            "vu": 520.8333333333334,
+            "status": "Base Referência"
+          },
+          {
+            "id": 66,
+            "tipo": "Residencial",
+            "vu": 343.52571712158823,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 65,
+            "tipo": "Residencial",
+            "vu": 291.5505185185186,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 69,
+            "tipo": "Residencial",
+            "vu": 631.8697777777778,
+            "status": "Validada por Zona"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3481,12 +3857,27 @@
         "camada_original": "ZONA 07",
         "camadas_originais": "ZONA 07",
         "quantidade_feicoes_originais": 2,
-        "mediana_vu": 501.6950612835688,
+        "mediana_vu": 501.69506128356875,
         "total_validas": 0,
         "lotes_vagos": 0,
         "edif_validadas": 0,
         "imputado_idw": true,
-        "metodo_val": "IDW"
+        "metodo_val": "IDW",
+        "amostras_oficiais_ids": [],
+        "amostras_oficiais_detalhes": [],
+        "zonas_idw_usadas": [
+          "ZONA 06",
+          "ZONA 01",
+          "ZONA 05",
+          "ZONA 04",
+          "ZONA 12",
+          "ZONA 14",
+          "ZONA 11",
+          "ZONA 08",
+          "ZONA 03",
+          "ZONA 09",
+          "ZONA 13"
+        ]
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3906,7 +4297,19 @@
         "lotes_vagos": 1,
         "edif_validadas": 0,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          91
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 91,
+            "tipo": "Lote Vago",
+            "vu": 400,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -3992,7 +4395,19 @@
         "lotes_vagos": 1,
         "edif_validadas": 0,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          97
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 97,
+            "tipo": "Lote Vago",
+            "vu": 416.6666666666667,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -4426,7 +4841,22 @@
         "lotes_vagos": 0,
         "edif_validadas": 0,
         "imputado_idw": true,
-        "metodo_val": "IDW"
+        "metodo_val": "IDW",
+        "amostras_oficiais_ids": [],
+        "amostras_oficiais_detalhes": [],
+        "zonas_idw_usadas": [
+          "ZONA 06",
+          "ZONA 01",
+          "ZONA 05",
+          "ZONA 04",
+          "ZONA 12",
+          "ZONA 14",
+          "ZONA 11",
+          "ZONA 08",
+          "ZONA 03",
+          "ZONA 09",
+          "ZONA 13"
+        ]
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4586,7 +5016,54 @@
         "lotes_vagos": 5,
         "edif_validadas": 1,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          135,
+          102,
+          104,
+          114,
+          126,
+          138
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 135,
+            "tipo": "Lote Vago",
+            "vu": 116.66666666666667,
+            "status": "Base Referência"
+          },
+          {
+            "id": 102,
+            "tipo": "Lote Vago",
+            "vu": 240,
+            "status": "Base Referência"
+          },
+          {
+            "id": 104,
+            "tipo": "Lote Vago",
+            "vu": 296.2962962962963,
+            "status": "Base Referência"
+          },
+          {
+            "id": 114,
+            "tipo": "Lote Vago",
+            "vu": 136.05442176870747,
+            "status": "Base Referência"
+          },
+          {
+            "id": 126,
+            "tipo": "Lote Vago",
+            "vu": 88.88888888888889,
+            "status": "Base Referência"
+          },
+          {
+            "id": 138,
+            "tipo": "Residencial",
+            "vu": 83.73656,
+            "status": "Validada por Zona"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -5088,7 +5565,96 @@
         "lotes_vagos": 12,
         "edif_validadas": 0,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          27,
+          86,
+          92,
+          105,
+          106,
+          110,
+          111,
+          112,
+          108,
+          117,
+          119,
+          120
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 27,
+            "tipo": "Lote Vago",
+            "vu": 216.66666666666666,
+            "status": "Base Referência"
+          },
+          {
+            "id": 86,
+            "tipo": "Lote Vago",
+            "vu": 112,
+            "status": "Base Referência"
+          },
+          {
+            "id": 92,
+            "tipo": "Lote Vago",
+            "vu": 317.46031746031747,
+            "status": "Base Referência"
+          },
+          {
+            "id": 105,
+            "tipo": "Lote Vago",
+            "vu": 50.89058524173028,
+            "status": "Base Referência"
+          },
+          {
+            "id": 106,
+            "tipo": "Lote Vago",
+            "vu": 166.66666666666666,
+            "status": "Base Referência"
+          },
+          {
+            "id": 110,
+            "tipo": "Lote Vago",
+            "vu": 133.33333333333334,
+            "status": "Base Referência"
+          },
+          {
+            "id": 111,
+            "tipo": "Lote Vago",
+            "vu": 166.66666666666666,
+            "status": "Base Referência"
+          },
+          {
+            "id": 112,
+            "tipo": "Lote Vago",
+            "vu": 166.66666666666666,
+            "status": "Base Referência"
+          },
+          {
+            "id": 108,
+            "tipo": "Lote Vago",
+            "vu": 88.88888888888889,
+            "status": "Base Referência"
+          },
+          {
+            "id": 117,
+            "tipo": "Lote Vago",
+            "vu": 77.77777777777777,
+            "status": "Base Referência"
+          },
+          {
+            "id": 119,
+            "tipo": "Lote Vago",
+            "vu": 133.33333333333334,
+            "status": "Base Referência"
+          },
+          {
+            "id": 120,
+            "tipo": "Lote Vago",
+            "vu": 150,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -5376,7 +5942,75 @@
         "lotes_vagos": 9,
         "edif_validadas": 0,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          115,
+          118,
+          121,
+          123,
+          124,
+          125,
+          130,
+          131,
+          133
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 115,
+            "tipo": "Lote Vago",
+            "vu": 373.3333333333333,
+            "status": "Base Referência"
+          },
+          {
+            "id": 118,
+            "tipo": "Lote Vago",
+            "vu": 177.77777777777777,
+            "status": "Base Referência"
+          },
+          {
+            "id": 121,
+            "tipo": "Lote Vago",
+            "vu": 151.5151515151515,
+            "status": "Base Referência"
+          },
+          {
+            "id": 123,
+            "tipo": "Lote Vago",
+            "vu": 211.11111111111111,
+            "status": "Base Referência"
+          },
+          {
+            "id": 124,
+            "tipo": "Lote Vago",
+            "vu": 37.5,
+            "status": "Base Referência"
+          },
+          {
+            "id": 125,
+            "tipo": "Lote Vago",
+            "vu": 84.44444444444444,
+            "status": "Base Referência"
+          },
+          {
+            "id": 130,
+            "tipo": "Lote Vago",
+            "vu": 31.25,
+            "status": "Base Referência"
+          },
+          {
+            "id": 131,
+            "tipo": "Lote Vago",
+            "vu": 25,
+            "status": "Base Referência"
+          },
+          {
+            "id": 133,
+            "tipo": "Lote Vago",
+            "vu": 75,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "Polygon",
@@ -5462,7 +6096,96 @@
         "lotes_vagos": 11,
         "edif_validadas": 1,
         "imputado_idw": false,
-        "metodo_val": "Mediana Direta"
+        "metodo_val": "Mediana Direta",
+        "amostras_oficiais_ids": [
+          134,
+          136,
+          103,
+          127,
+          140,
+          142,
+          143,
+          144,
+          146,
+          148,
+          150,
+          152
+        ],
+        "amostras_oficiais_detalhes": [
+          {
+            "id": 134,
+            "tipo": "Lote Vago",
+            "vu": 46.666666666666664,
+            "status": "Base Referência"
+          },
+          {
+            "id": 136,
+            "tipo": "Lote Vago",
+            "vu": 83.33333333333333,
+            "status": "Base Referência"
+          },
+          {
+            "id": 103,
+            "tipo": "Lote Vago",
+            "vu": 177.77777777777777,
+            "status": "Base Referência"
+          },
+          {
+            "id": 127,
+            "tipo": "Lote Vago",
+            "vu": 88.88888888888889,
+            "status": "Base Referência"
+          },
+          {
+            "id": 140,
+            "tipo": "Lote Vago",
+            "vu": 55.55555555555556,
+            "status": "Base Referência"
+          },
+          {
+            "id": 142,
+            "tipo": "Residencial",
+            "vu": 120.33718518518519,
+            "status": "Validada por Zona"
+          },
+          {
+            "id": 143,
+            "tipo": "Lote Vago",
+            "vu": 66.66666666666667,
+            "status": "Base Referência"
+          },
+          {
+            "id": 144,
+            "tipo": "Lote Vago",
+            "vu": 66.815144766147,
+            "status": "Base Referência"
+          },
+          {
+            "id": 146,
+            "tipo": "Lote Vago",
+            "vu": 77.77777777777777,
+            "status": "Base Referência"
+          },
+          {
+            "id": 148,
+            "tipo": "Lote Vago",
+            "vu": 40,
+            "status": "Base Referência"
+          },
+          {
+            "id": 150,
+            "tipo": "Lote Vago",
+            "vu": 83.33333333333333,
+            "status": "Base Referência"
+          },
+          {
+            "id": 152,
+            "tipo": "Lote Vago",
+            "vu": 55.55555555555556,
+            "status": "Base Referência"
+          }
+        ],
+        "zonas_idw_usadas": []
       },
       "geometry": {
         "type": "MultiPolygon",
