@@ -1,0 +1,76 @@
+{
+  "scale": 0.981573434287712,
+  "rotation_deg": -0.500049958328535,
+  "tx": 713787.2226796716,
+  "ty": 8862762.153499069,
+  "rmse_m": 62.48045717847903,
+  "epsg": 31981,
+  "n_gcps": 8,
+  "method": "similarity_ls",
+  "gcps": [
+    {
+      "name": "GETULIO VARGAS",
+      "cad_x": 5960.61271257165,
+      "cad_y": 5323.599483464585,
+      "lon": -54.9947411,
+      "lat": -10.235044,
+      "cad_label": "RUA GETÚLIO VARGAS"
+    },
+    {
+      "name": "TANCREDO NEVES",
+      "cad_x": 6315.437911937142,
+      "cad_y": 4537.00829461606,
+      "lon": -54.9917339,
+      "lat": -10.2424314,
+      "cad_label": "RUA TANCREDO NEVES"
+    },
+    {
+      "name": "NEREU RAMOS",
+      "cad_x": 6733.123890352257,
+      "cad_y": 5188.256252310036,
+      "lon": -54.9871978,
+      "lat": -10.2356904,
+      "cad_label": "RUA NEREU RAMOS"
+    },
+    {
+      "name": "NOVO HAMBURGO",
+      "cad_x": 7164.74816607164,
+      "cad_y": 4186.21543487958,
+      "lon": -54.9830655,
+      "lat": -10.2452729,
+      "cad_label": "Av. NOVO HAMBURGO"
+    },
+    {
+      "name": "MARANHAO",
+      "cad_x": 6423.9481866344195,
+      "cad_y": 3504.1258660930807,
+      "lon": -54.9907983,
+      "lat": -10.2508422,
+      "cad_label": "AVENIDA MARANHÃO"
+    },
+    {
+      "name": "MARCELINO RAMOS",
+      "cad_x": 7381.546985544946,
+      "cad_y": 4166.767221135881,
+      "lon": -54.9821111,
+      "lat": -10.2445692,
+      "cad_label": "Av. MARCELINO RAMOS"
+    },
+    {
+      "name": "EURICO DUTRA",
+      "cad_x": 6615.792961166764,
+      "cad_y": 4896.500157586718,
+      "lon": -54.9883706,
+      "lat": -10.238429,
+      "cad_label": "RUA EURICO DUTRA"
+    },
+    {
+      "name": "PEDRO ALVARES CABRAL",
+      "cad_x": 6209.02876514079,
+      "cad_y": 5154.393788170315,
+      "lon": -54.9917433,
+      "lat": -10.2367265,
+      "cad_label": "RUA PEDRO ALVARES CABRAL"
+    }
+  ]
+}

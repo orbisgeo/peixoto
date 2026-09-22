@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard PGV - Valoração por Zona com Exportação GeoJSON</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js"></script>
+    <style>
+        #map { height: 100%; min-height: 500px; border-radius: 0.5rem; z-index: 1; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2 text-gray-700">Painel PGV - Valoração por Zona (Com Exportação)</h1>
+        <p class="text-gray-500 mb-6">Tratamento setorial (Atributo <code>Layer</code>), demolição via CUB/MT ou Tabela da Prefeitura[cite: 3], IDW e exportação espacial dos resultados.</p>
+
+        <!-- Controles do Painel -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-wrap gap-4 items-end">
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Método de Custo</label>
+                <select id="metodoCusto" onchange="toggleMetodoCusto()" class="border p-2 rounded w-44 bg-white focus:ring-2 focus:ring-blue-500">
+                    <option value="cub">CUB/MT Customizado</option>
+                    <option value="prefeitura">Tabela Prefeitura (UPFM)</option>
+                </select>
+            </div>
+
+            <!-- Parâmetros CUB -->
+            <div id="blocoCub" class="flex gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">CUB/MT (R$/m²)</label>
+                    <input type="number" id="inputCub" value="3229.54" class="border p-2 rounded w-32 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Fator Depreciação</label>
+                    <input type="number" id="inputDeprec" value="0.6" step="0.1" class="border p-2 rounded w-32 focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <!-- Parâmetros Tabela Prefeitura (Decreto 001/2026) -->
+            <div id="blocoPrefeitura" class="flex gap-4 hidden">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Tipo Edificação</label>
+                    <select id="prefTipo" class="border p-2 rounded w-36 bg-white">
+                        <option value="alvenaria">Alvenaria</option>
+                        <option value="mista">Mista</option>
+                        <option value="madeira">Madeira</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Conservação</label>
+                    <select id="prefConservacao" class="border p-2 rounded w-36 bg-white">
+                        <option value="novo">Novo / Ótimo</option>
+                        <option value="bom" selected>Bom</option>
+                        <option value="regular">Regular</option>
+                        <option value="ruim">Ruim</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="step1_FixTypos()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow transition font-medium">
+                1. Padronizar Tipologias
+            </button>
+            <button onclick="step2_RemoveOutliers()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition font-medium">
+                2. Filtrar Outliers Brutos
+            </button>
+            <button onclick="step3_DemolicaoSetorizada()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition font-bold">
+                3. Executar Validação por Zona
+            </button>
+            <button onclick="exportZonasGeoJSON()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow transition font-bold">
+                4. Exportar Setores (GeoJSON)
+            </button>
+        </div>
+
+        <!-- Cards de Resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+                <p class="text-sm text-gray-500">Total de Amostras</p>
+                <p id="statTotal" class="text-2xl font-bold text-gray-700">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
+                <p class="text-sm text-gray-500">Amostras Validadas</p>
+                <p id="statValidadas" class="text-2xl font-bold text-green-600">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-red-500">
+                <p class="text-sm text-gray-500">Amostras Excluídas</p>
+                <p id="statExcluidas" class="text-2xl font-bold text-red-600">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-500">
+                <p class="text-sm text-gray-500">Zonas Totais (Shapefile)</p>
+                <p id="statZonas" class="text-2xl font-bold text-yellow-600">0</p>
+            </div>
+        </div>
+
+        <!-- Grid Principal (Gráfico e Mapa) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow-md col-span-1">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Área x VU Válidos (R$/m²)</h2>
+                <div style="height: 440px;">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow-md col-span-1 md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Zoneamento e Localização das Amostras</h2>
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- Tabela de Valoração por Zona -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Valoração por Zona (Mediana do VU, IDW e Amostras)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b text-sm text-gray-600">
+                            <th class="p-3">Zona (Layer)</th>
+                            <th class="p-3">Total Válidas</th>
+                            <th class="p-3">Lotes Vagos Base</th>
+                            <th class="p-3">Edif. Validadas</th>
+                            <th class="p-3 font-bold text-indigo-600">Mediana do VU (R$/m²)</th>
+                            <th class="p-3">Origem / Amostras Utilizadas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaZonas" class="text-sm divide-y">
+                        <tr><td colspan="6" class="p-4 text-center text-gray-400">Execute a Etapa 3 para calcular a valoração por zona.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabela Detalhada das Amostras -->
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Detalhamento Individual das Amostras</h2>
+            <div class="overflow-x-auto max-h-80">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b text-sm text-gray-600">
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Tipologia</th>
+                            <th class="p-3">Zona (Layer)</th>
+                            <th class="p-3">V. Total (R$)</th>
+                            <th class="p-3">Área Terreno</th>
+                            <th class="p-3">Área Constr.</th>
+                            <th class="p-3">VU Terr. (R$/m²)</th>
+                            <th class="p-3">Status Validação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaAmostras" class="text-sm divide-y">
+                        <!-- Preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        proj4.defs("EPSG:31981", "+proj=utm +zone=21 +south +datum=SIRGAS2000 +units=m +no_defs");
+
+        function toLatLng(utmCoords) {
+            let res = proj4("EPSG:31981", "EPSG:4326", utmCoords);
+            return [res[1], res[0]];
+        }
+
+        let rawGeoJSON = null;
+        let setoresGeoJSON = null;
+        let workingData = null;
+        let map, markersGroup;
+        let scatterChart;
+        let zoneCentroids = {};
+        let ultimosCalculosZonas = {}; // Armazena dados para exportação
+
+        window.onload = function() {
+            Promise.all([
+                fetch('amostras2.geojson').then(res => res.json()),
+                fetch('setores220926.geojson').then(res => res.json())
+            ])
+            .then(([amostras, setores]) => {
+                rawGeoJSON = amostras;
+                setoresGeoJSON = setores;
+                initApp();
+            })
+            .catch(err => {
+                console.error("Erro ao carregar arquivos locais:", err);
+                alert("Certifique-se de que 'amostras2.geojson' e 'setores220926.geojson' estão na mesma pasta do arquivo HTML.");
+            });
+        };
+
+        function toggleMetodoCusto() {
+            let m = document.getElementById('metodoCusto').value;
+            if(m === 'cub') {
+                document.getElementById('blocoCub').classList.remove('hidden');
+                document.getElementById('blocoPrefeitura').classList.add('hidden');
+            } else {
+                document.getElementById('blocoCub').classList.add('hidden');
+                document.getElementById('blocoPrefeitura').classList.remove('hidden');
+            }
+        }
+
+        function initApp() {
+            workingData = JSON.parse(JSON.stringify(rawGeoJSON));
+            
+            map = L.map('map').setView([-10.22, -54.97], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            markersGroup = L.featureGroup().addTo(map);
+
+            let totalZonas = 0;
+            if (setoresGeoJSON && setoresGeoJSON.features) {
+                setoresGeoJSON.features.forEach(z => {
+                    totalZonas++;
+                    let nomeZona = z.properties.zona || z.properties.camada_original || "Zona Desconhecida";
+                    let rings = getPolygonRings(z.geometry);
+                    
+                    if(rings.length > 0) {
+                        zoneCentroids[nomeZona] = getPolygonCentroid(rings[0]);
+                    }
+
+                    rings.forEach(ring => {
+                        let latLngs = ring.map(coord => toLatLng(coord));
+                        L.polygon(latLngs, { color: '#6366f1', weight: 1.5, fillOpacity: 0.05 })
+                         .bindTooltip(nomeZona)
+                         .addTo(map);
+                    });
+                });
+            }
+            document.getElementById('statZonas').innerText = totalZonas;
+
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+            scatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Área Terreno (m²)' } },
+                        y: { title: { display: true, text: 'VU Estimado por Zona (R$/m²)' } }
+                    }
+                }
+            });
+
+            updateUI();
+        }
+
+        function getPolygonRings(geometry) {
+            let rings = [];
+            if (geometry.type === "Polygon") {
+                rings.push(geometry.coordinates[0]);
+            } else if (geometry.type === "MultiPolygon") {
+                geometry.coordinates.forEach(poly => {
+                    rings.push(poly[0]);
+                });
+            }
+            return rings;
+        }
+
+        function getPolygonCentroid(ring) {
+            let sumX = 0, sumY = 0;
+            let len = ring.length;
+            for(let i=0; i<len; i++) {
+                sumX += ring[i][0];
+                sumY += ring[i][1];
+            }
+            return [sumX/len, sumY/len];
+        }
+
+        function getDistance(c1, c2) {
+            return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2));
+        }
+
+        function pointInPolygon(point, vs) {
+            let x = point[0], y = point[1];
+            let inside = false;
+            for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+                let xi = vs[i][0], yi = vs[i][1];
+                let xj = vs[j][0], yj = vs[j][1];
+                let intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        function calculateMedian(values) {
+            if (values.length === 0) return 0;
+            let sorted = [...values].sort((a, b) => a - b);
+            let mid = Math.floor(sorted.length / 2);
+            return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+        }
+
+        function step1_FixTypos() {
+            workingData.features.forEach(f => {
+                let t = (f.properties.tipo || "Não Informado").trim().toLowerCase();
+                if(t.includes("terreno") || t.includes("vago") || t.includes("vagp")) f.properties.tipo_padrao = "Lote Vago";
+                else if(t.includes("residencial") || t.includes("residencia") || t.includes("casa")) f.properties.tipo_padrao = "Residencial";
+                else if(t.includes("comercial")) f.properties.tipo_padrao = "Comercial";
+                else f.properties.tipo_padrao = "Outros";
+            });
+            alert("Tipologias padronizadas!");
+            updateUI();
+        }
+
+        function step2_RemoveOutliers() {
+            workingData.features = workingData.features.filter(f => {
+                let a = f.properties.area_total, v = f.properties.valor;
+                return (a >= 50 && a <= 5000) && (v >= 10 && v <= 5000000);
+            });
+            alert("Outliers brutos filtrados!");
+            updateUI();
+        }
+
+        function step3_DemolicaoSetorizada() {
+            const metodo = document.getElementById('metodoCusto').value;
+            let custoConstrucaoM2 = 0;
+
+            if (metodo === 'cub') {
+                const cub = parseFloat(document.getElementById('inputCub').value);
+                const fatorDeprec = parseFloat(document.getElementById('inputDeprec').value);
+                var globalCub = cub;
+                var globalDeprec = fatorDeprec;
+            } else {
+                const upfmVal = 30.90;
+                const tipo = document.getElementById('prefTipo').value;
+                const conservacao = document.getElementById('prefConservacao').value;
+                
+                const tabelaUPFM = {
+                    alvenaria: { novo: 7.36, bom: 3.82, regular: 3.61, ruim: 2.52 },
+                    mista: { novo: 4.40, bom: 3.06, regular: 2.15, ruim: 1.50 },
+                    madeira: { novo: 3.29, bom: 2.29, regular: 1.61, ruim: 1.13 }
+                };
+                
+                let indicesUPFM = tabelaUPFM[tipo] || tabelaUPFM.alvenaria;
+                let indiceEscolhido = indicesUPFM[conservacao] || indicesUPFM.bom;
+                custoConstrucaoM2 = indiceEscolhido * upfmVal;
+            }
+
+            // 1. Associa cada amostra à sua respectiva ZONA (Layer)
+            workingData.features.forEach(f => {
+                let coord = f.geometry.coordinates;
+                let zona = "Fora de Zona";
+                if (setoresGeoJSON && setoresGeoJSON.features) {
+                    for (let s of setoresGeoJSON.features) {
+                        let rings = getPolygonRings(s.geometry);
+                        let match = rings.some(ring => pointInPolygon(coord, ring));
+                        if (match) {
+                            zona = s.properties.zona || s.properties.camada_original || "Zona Definida";
+                            break;
+                        }
+                    }
+                }
+                f.properties.setor = zona;
+            });
+
+            // 2. Estatística por Zona (Lotes Vagos Base)
+            let zonasMap = {};
+            workingData.features.forEach(f => {
+                let p = f.properties;
+                if(p.tipo_padrao === "Lote Vago") {
+                    let val = p.valor < 10000 ? p.valor * 1000 : p.valor;
+                    p.vu_estimado = val / p.area_total;
+                    if(!zonasMap[p.setor]) zonasMap[p.setor] = [];
+                    zonasMap[p.setor].push(p.vu_estimado);
+                    p.status_validacao = "Base Referência";
+                }
+            });
+
+            let limitesZona = {};
+            for(let zona in zonasMap) {
+                let arr = zonasMap[zona];
+                let media = arr.reduce((a,b)=>a+b,0) / arr.length;
+                let dp = Math.sqrt(arr.reduce((a,b)=>a+Math.pow(b-media,2),0)/arr.length);
+                limitesZona[zona] = {
+                    min: Math.max(0, media - 1.5 * dp),
+                    max: media + 1.5 * dp
+                };
+            }
+
+            // 3. Demolição Estatística por Zona
+            workingData.features.forEach(f => {
+                let p = f.properties;
+                if(p.tipo_padrao !== "Lote Vago") {
+                    let val = p.valor < 10000 ? p.valor * 1000 : p.valor;
+                    let custoConstrucao = 0;
+
+                    if (metodo === 'cub') {
+                        custoConstrucao = (p.area_contr || 0) * globalCub * globalDeprec;
+                    } else {
+                        custoConstrucao = (p.area_contr || 0) * custoConstrucaoM2;
+                    }
+
+                    let terraResiduo = val - custoConstrucao;
+
+                    if(terraResiduo <= 0) {
+                        p.vu_estimado = 0;
+                        p.status_validacao = "Inválida (Custo > Valor)";
+                    } else {
+                        p.vu_estimado = terraResiduo / p.area_total;
+                        let lim = limitesZona[p.setor];
+                        if(lim && p.vu_estimado >= lim.min && p.vu_estimado <= lim.max) {
+                            p.status_validacao = "Validada por Zona";
+                        } else {
+                            p.status_validacao = "Inválida (Fora da Tolerância da Zona)";
+                        }
+                    }
+                }
+            });
+
+            alert("Demolição e valoração por zona recalculadas com sucesso!");
+            updateUI();
+        }
+
+        function updateUI() {
+            markersGroup.clearLayers();
+            let total = workingData.features.length;
+            let validadas = 0;
+            let tbodyAmostras = document.getElementById('tabelaAmostras');
+            tbodyAmostras.innerHTML = "";
+
+            let agregacaoZonas = {};
+
+            workingData.features.forEach(f => {
+                let props = f.properties;
+                let ll = toLatLng(f.geometry.coordinates);
+                let status = props.status_validacao || "Pendente";
+                let zona = props.setor || "Não Mapeado";
+                
+                let isValida = status.includes("Validada") || status === "Base Referência";
+                if(isValida) {
+                    validadas++;
+                    if(!agregacaoZonas[zona]) agregacaoZonas[zona] = { total: 0, vagos: 0, validadas: 0, vus: [], samples: [], imputado: false };
+                    agregacaoZonas[zona].total++;
+                    if(status === "Base Referência") agregacaoZonas[zona].vagos++;
+                    if(status === "Validada por Zona") agregacaoZonas[zona].validadas++;
+                    if(props.vu_estimado) {
+                        agregacaoZonas[zona].vus.push(props.vu_estimado);
+                        agregacaoZonas[zona].samples.push({
+                            id: props.id,
+                            tipo: props.tipo_padrao || props.tipo || 'Outros',
+                            vu: props.vu_estimado,
+                            status: status
+                        });
+                    }
+                }
+
+                let col = isValida ? "green" : "red";
+                
+                L.circleMarker([ll[0], ll[1]], { radius: 5, color: col, fillOpacity: 0.8 })
+                 .bindPopup(`<b>ID:</b> ${props.id}<br><b>Zona:</b> ${zona}<br><b>Status:</b> ${status}`)
+                 .addTo(markersGroup);
+
+                let valFormatted = props.valor ? (props.valor < 10000 ? props.valor * 1000 : props.valor).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : '-';
+                let vuFormatted = props.vu_estimado ? props.vu_estimado.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : '-';
+                
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 border-b text-gray-700";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${props.id}</td>
+                    <td class="p-3">${props.tipo_padrao || props.tipo || 'Não Informado'}</td>
+                    <td class="p-3 font-semibold text-indigo-600">${zona}</td>
+                    <td class="p-3">${valFormatted}</td>
+                    <td class="p-3">${props.area_total} m²</td>
+                    <td class="p-3">${props.area_contr ? props.area_contr + ' m²' : '-'}</td>
+                    <td class="p-3 font-bold">${vuFormatted}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-semibold ${isValida ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${status}</span></td>
+                `;
+                tbodyAmostras.appendChild(tr);
+            });
+
+            // Garantir que todas as zonas apareçam na tabela
+            if (setoresGeoJSON && setoresGeoJSON.features) {
+                setoresGeoJSON.features.forEach(s => {
+                    let zName = s.properties.zona || s.properties.camada_original || "Zona Desconhecida";
+                    if (!agregacaoZonas[zName]) {
+                        agregacaoZonas[zName] = { total: 0, vagos: 0, validadas: 0, vus: [], samples: [], imputado: false };
+                    }
+                });
+            }
+
+            // IMPUTAÇÃO ESPACIAL IDW
+            let zonasComDados = Object.keys(agregacaoZonas).filter(z => agregacaoZonas[z].vus.length > 0);
+            let medianasZonasComDados = {};
+            zonasComDados.forEach(z => {
+                medianasZonasComDados[z] = calculateMedian(agregacaoZonas[z].vus);
+            });
+
+            for (let z in agregacaoZonas) {
+                if (agregacaoZonas[z].vus.length === 0 && zoneCentroids[z]) {
+                    let centroidAlvo = zoneCentroids[z];
+                    let somaPonderada = 0;
+                    let somaPesos = 0;
+
+                    zonasComDados.forEach(zComDados => {
+                        let centroidVizinho = zoneCentroids[zComDados];
+                        if (centroidVizinho) {
+                            let dist = getDistance(centroidAlvo, centroidVizinho);
+                            if (dist === 0) dist = 0.0001;
+                            
+                            let peso = 1 / Math.pow(dist, 2);
+                            somaPonderada += medianasZonasComDados[zComDados] * peso;
+                            somaPesos += peso;
+                        }
+                    });
+
+                    if (somaPesos > 0) {
+                        let valorIDW = somaPonderada / somaPesos;
+                        agregacaoZonas[z].vus = [valorIDW];
+                        agregacaoZonas[z].imputado = true;
+                        agregacaoZonas[z].metodoImputacao = "IDW";
+                    }
+                }
+            }
+
+            // Guardar globalmente para exportação
+            ultimosCalculosZonas = {};
+            for(let z in agregacaoZonas) {
+                ultimosCalculosZonas[z] = {
+                    medianaVU: calculateMedian(agregacaoZonas[z].vus),
+                    total: agregacaoZonas[z].total,
+                    vagos: agregacaoZonas[z].vagos,
+                    validadas: agregacaoZonas[z].validadas,
+                    imputado: agregacaoZonas[z].imputado,
+                    vus: agregacaoZonas[z].vus
+                };
+            }
+
+            // Preencher Tabela de Valoração por Zona
+            let tbodyZonas = document.getElementById('tabelaZonas');
+            tbodyZonas.innerHTML = "";
+            let zonasAtivasCount = Object.keys(agregacaoZonas).length;
+
+            for(let z in agregacaoZonas) {
+                let dados = agregacaoZonas[z];
+                let medianaVU = ultimosCalculosZonas[z].medianaVU;
+                
+                let origemHtml = "";
+                if (dados.imputado) {
+                    origemHtml = `<span class="text-amber-600 font-semibold text-xs bg-amber-50 px-2 py-1 rounded border border-amber-200">IDW (Imputado Espacial)</span>`;
+                } else if (dados.samples.length > 0) {
+                    let optionsHtml = dados.samples.map(s => 
+                        `<option value="${s.id}">ID ${s.id} | ${s.tipo} | VU: ${s.vu.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} (${s.status})</option>`
+                    ).join('');
+
+                    origemHtml = `<select class="border rounded p-1 text-xs bg-white text-gray-700 w-full focus:ring-1 focus:ring-indigo-500">
+                        <option value="">Ver ${dados.samples.length} amostras usadas...</option>
+                        ${optionsHtml}
+                    </select>`;
+                } else {
+                    origemHtml = `<span class="text-gray-400 text-xs">Sem dados e sem vizinhos próximos</span>`;
+                }
+
+                let trZ = document.createElement('tr');
+                trZ.className = "hover:bg-gray-50 border-b text-gray-700";
+                trZ.innerHTML = `
+                    <td class="p-3 font-bold text-gray-800">${z}</td>
+                    <td class="p-3">${dados.total}</td>
+                    <td class="p-3 text-blue-600 font-medium">${dados.vagos}</td>
+                    <td class="p-3 text-green-600 font-medium">${dados.validadas}</td>
+                    <td class="p-3 font-bold text-indigo-600 text-base">${medianaVU > 0 ? medianaVU.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : 'R$ 0,00'}</td>
+                    <td class="p-3 w-80">${origemHtml}</td>
+                `;
+                tbodyZonas.appendChild(trZ);
+            }
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statValidadas').innerText = validadas;
+            document.getElementById('statExcluidas').innerText = total - validadas;
+            document.getElementById('statZonas').innerText = zonasAtivasCount;
+
+            if (markersGroup.getLayers().length > 0) map.fitBounds(markersGroup.getBounds());
+
+            let validasArr = workingData.features.filter(f => {
+                let s = f.properties.status_validacao;
+                return s?.includes("Validada") || s === "Base Referência";
+            });
+
+            let cData = validasArr.map(f => ({ x: f.properties.area_total, y: f.properties.vu_estimado }));
+
+            scatterChart.data.datasets = [{
+                label: 'Amostras Válidas por Zona',
+                data: cData,
+                backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                borderColor: 'rgba(29, 78, 216, 1)',
+                pointRadius: 5
+            }];
+            scatterChart.update();
+        }
+
+        // Função para exportar as Zonas valoradas em GeoJSON
+        function exportZonasGeoJSON() {
+            if (!setoresGeoJSON || Object.keys(ultimosCalculosZonas).length === 0) {
+                alert("Execute a validação por zona (Etapa 3) antes de exportar os dados.");
+                return;
+            }
+
+            let exportData = JSON.parse(JSON.stringify(setoresGeoJSON));
+            exportData.features.forEach(f => {
+                let zName = f.properties.zona || f.properties.camada_original || "Desconhecida";
+                let calc = ultimosCalculosZonas[zName];
+                if (calc) {
+                    f.properties.mediana_vu = calc.medianaVU;
+                    f.properties.total_validas = calc.total;
+                    f.properties.lotes_vagos = calc.vagos;
+                    f.properties.edif_validadas = calc.validadas;
+                    f.properties.imputado_idw = calc.imputado;
+                    f.properties.metodo_val = calc.imputado ? "IDW" : (calc.vus.length > 0 ? "Mediana Direta" : "Sem Dados");
+                } else {
+                    f.properties.mediana_vu = 0;
+                    f.properties.total_validas = 0;
+                    f.properties.imputado_idw = false;
+                    f.properties.metodo_val = "Sem Dados";
+                }
+            });
+
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            let downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "setores_valorados_pgv.geojson");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>

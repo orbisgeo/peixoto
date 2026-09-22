@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORBIS TRIB - Gestão Tributária (Peixoto de Azevedo/MT)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
+        .input-focus:focus { border-color: #6366f1; outline: none; }
+        #mapa-setores { z-index: 10; }
+        .juridico-doc { font-family: 'Times New Roman', Times, serif; font-size: 11.5pt; line-height: 1.45;
+            color: #000; background: white; padding: 2.5cm 2cm 2cm 2.5cm; max-width: 21cm; margin: 0 auto; }
+        .juridico-header { text-align: center; margin-bottom: 25px; }
+        .juridico-header h1 { font-size: 13pt; font-weight: bold; margin: 0; text-transform: uppercase; }
+        .juridico-header p  { font-size: 11pt; font-weight: bold; margin: 0; }
+        .ementa { margin-left: 7.5cm; margin-bottom: 20px; font-style: italic; font-size: 9.5pt; text-align: justify; }
+        .juridico-doc h2 { font-size: 11pt; font-weight: bold; text-align: center; margin: 20px 0 10px 0;
+            text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 2px; }
+        .juridico-doc p  { text-indent: 2cm; margin-bottom: 8px; text-align: justify !important; }
+        .artigo { font-weight: bold; }
+        .juridico-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 10pt; }
+        .juridico-table th, .juridico-table td { border: 1px solid #000; padding: 5px; text-align: center; }
+        .juridico-table th { background-color: #f0f0f0; font-weight: bold; }
+
+        @media print {
+            html, body { height: auto !important; overflow: visible !important; }
+            body * { visibility: hidden; }
+            #modal-minuta, #modal-minuta * { visibility: visible; }
+            #modal-minuta {
+                position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0;
+                background: white; height: auto !important; overflow: visible !important;
+            }
+            #modal-minuta > div { height: auto !important; overflow: visible !important; }
+            .juridico-doc { width: 100%; max-width: none; padding: 1.5cm; box-shadow: none; margin: 0; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="pb-16">
+
+<nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-md border-b-4 border-indigo-500">
+    <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex flex-col md:flex-row items-center gap-4">
+            <div class="text-2xl font-black text-white uppercase tracking-widest md:border-r-2 md:border-slate-700 md:pr-4">PEIXOTO DE AZEVEDO</div>
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded shadow"><i data-lucide="scale" class="w-6 h-6 text-white"></i></div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">ORBIS TRIB - Gestão Tributária</h1>
+                    <p class="text-[10px] text-emerald-400 uppercase tracking-widest font-bold">LC 40/2014 & Decreto 001/2026 (UPFM: R$ 30,90)</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="openTutorial()" class="flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-slate-900 px-3 py-1.5 rounded text-xs font-bold shadow transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4"></i> Guia Técnico
+        </button>
+        <label class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded text-xs font-bold cursor-pointer" title="Alterna entre o cálculo com e sem fatores corretivos">
+            <input type="checkbox" id="toggle-fatores" checked onchange="alternarFatores()" class="accent-emerald-400">
+            <span>Usar fatores corretivos</span>
+        </label>
+    </div>
+</nav>
+
+<div class="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- COLUNA ESQUERDA -->
+    <div class="lg:col-span-7 space-y-5">
+
+        <!-- MAPA -->
+        <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+            <div class="bg-indigo-600 p-3 border-b border-indigo-700 flex items-center gap-2">
+                <i data-lucide="map-pinned" class="w-5 h-5 text-white"></i>
+                <h2 class="font-bold text-white text-sm uppercase tracking-wide">Mapa de Setores</h2>
+            </div>
+            <div class="p-4 bg-slate-50">
+                <div id="mapa-setores" class="h-[380px] w-full rounded-lg border border-slate-300 shadow-inner bg-slate-200 relative overflow-hidden"></div>
+                <p class="text-[10px] text-slate-500 mt-2 italic text-center">* Clique sobre um setor no mapa para selecioná-lo e recalcular os valores.</p>
+            </div>
+        </div>
+
+        <!-- DADOS DO TERRENO -->
+        <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 p-3 border-b border-slate-200 flex items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="ruler" class="w-5 h-5 text-slate-700"></i>
+                    <h2 class="font-bold text-slate-800 text-sm uppercase">1. Dados do Terreno (VVT)</h2>
+                </div>
+            </div>
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Setor Selecionado (PGV)</label>
+                    <select id="in-setor" class="w-full p-3 bg-indigo-50 border border-indigo-200 rounded text-sm font-bold text-indigo-800 shadow-sm" onchange="syncMapFromSelect(); calcular()"></select>
+                </div>
+                <div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-2 flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Valor Base m²</span>
+                        <span id="out-valor-setor" class="font-black text-slate-600 text-sm">R$ 0,00</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-slate-50 border border-slate-200 rounded p-2 flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">Equiv. em UPFM/m²</span>
+                        <span id="out-upfm-m2" class="font-black text-indigo-600 text-sm">0.00 UPFM</span>
+                    </div>
+                </div>
+                <div id="fatores-corretivos-panel" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:col-span-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pavimentação (K<sub>pav</sub>)</label>
+                        <select id="in-pav" class="w-full p-2 bg-white border border-slate-300 rounded text-xs font-medium" onchange="calcular()">
+                            <option value="1.00" selected>Asfalto (1.0)</option>
+                            <option value="0.90">Paralelepípedo / Bloco (0.9)</option>
+                            <option value="0.80">Sem pavimentação / Leito Natural (0.8)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Topografia (K<sub>d</sub>)</label>
+                        <select id="in-kd" class="w-full p-2 bg-white border border-slate-300 rounded text-xs font-medium" onchange="calcular()">
+                            <option value="1.00" selected>Plano (0 a 3%) - 1.0</option>
+                            <option value="0.95">Suave ondulado (3 a 8%) - 0.95</option>
+                            <option value="0.90">Ondulado (8 a 20%) - 0.90</option>
+                            <option value="0.85">Forte ondulado (20 a 45%) - 0.85</option>
+                            <option value="0.80">Montanhoso (45 a 75%) - 0.80</option>
+                            <option value="0.70">Escarpado (&gt; 75%) - 0.70</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Área Total do Terreno (m²)</label>
+                    <input type="number" id="in-at" class="w-full text-lg font-bold p-3 border border-slate-300 rounded outline-none input-focus text-slate-700 shadow-sm" placeholder="0.00" oninput="calcular()">
+                </div>
+                <div id="gleba-panel" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
+                        <span class="block text-[10px] font-bold text-indigo-700 uppercase">Fator de Gleba</span>
+                        <span id="out-fator-gleba" class="text-lg font-black text-indigo-700">1,00</span>
+                        <span id="gleba-msg" class="block text-[10px] text-slate-500 mt-1">Até 5.000 m²</span>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
+                        <span class="block text-[10px] font-bold text-indigo-700 uppercase">Área Tributável</span>
+                        <span id="out-att" class="text-lg font-black text-indigo-700">0,00 m²</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DADOS DA EDIFICAÇÃO -->
+        <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+            <div class="bg-orange-50 p-3 border-b border-orange-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="home" class="w-5 h-5 text-orange-600"></i>
+                    <h2 class="font-bold text-orange-900 text-sm uppercase">2. Edificação (VVE - Tabela II Dec. 001/2026)</h2>
+                </div>
+                <span class="text-[10px] bg-orange-200 text-orange-900 px-2 py-0.5 rounded font-bold">LC 40/2014</span>
+            </div>
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Área Construída (m²)</label>
+                    <input type="number" id="in-ac" class="w-full text-lg font-bold p-3 border border-slate-300 rounded outline-none input-focus text-slate-700 shadow-sm" placeholder="0.00" oninput="calcular()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Destinação e Tipologia</label>
+                    <select id="in-tipo-edif" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-slate-700" onchange="atualizarParametrosEdif(); calcular()">
+                        <optgroup label="Residencial">
+                            <option value="res_alv" selected>Residencial - Alvenaria</option>
+                            <option value="res_mis">Residencial - Mista</option>
+                            <option value="res_mad">Residencial - Madeira</option>
+                        </optgroup>
+                        <optgroup label="Comercial / Industrial">
+                            <option value="com_alv">Comercial/Industrial - Alvenaria</option>
+                            <option value="com_mis">Comercial/Industrial - Mista</option>
+                            <option value="com_mad">Comercial/Industrial - Madeira</option>
+                        </optgroup>
+                        <optgroup label="Comercial / Industrial (Barracão)">
+                            <option value="bar_alv">Barracão - Alvenaria</option>
+                            <option value="bar_mis">Barracão - Mista</option>
+                            <option value="bar_mad">Barracão - Madeira</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Estado de Conservação</label>
+                    <select id="in-conservacao" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-slate-700" onchange="atualizarParametrosEdif(); calcular()">
+                        <option value="novo">Novo / Ótimo</option>
+                        <option value="bom" selected>Bom</option>
+                        <option value="regular">Regular</option>
+                        <option value="ruim">Ruim</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-200 flex justify-between items-center text-xs">
+                    <span class="text-amber-900 font-bold uppercase text-[10px]">Valor Legal Unitário de Construção:</span>
+                    <div class="space-x-3">
+                        <span class="font-bold text-slate-600"><span id="out-vuc-upfm">0.00</span> UPFM/m²</span>
+                        <span class="font-black text-amber-800 text-sm" id="out-vuc-reais">R$ 0,00/m²</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="gerarMinuta()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3">
+            <i data-lucide="file-text"></i> GERAR PROJETO DE LEI E ANEXOS TRIBUTÁRIOS
+        </button>
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div class="lg:col-span-5 space-y-4">
+        <div class="sticky top-24">
+            <div class="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden mb-6">
+                <div class="bg-slate-900 p-6 text-center text-white">
+                    <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-1">Valor Venal Total Estimado</p>
+                    <div id="res-total-reais" class="text-4xl md:text-5xl font-black text-emerald-400">R$ 0,00</div>
+                    <div id="res-total-upfm" class="text-xs text-slate-300 mt-1 font-mono">0.00 UPFM</div>
+                </div>
+                <div class="p-6 space-y-5">
+                    <div class="border-l-4 border-indigo-500 pl-4">
+                        <div class="flex justify-between items-baseline mb-1">
+                            <span class="font-bold text-slate-700 text-sm">Terreno (VVT)</span>
+                            <span id="res-vvt-reais" class="text-indigo-600 font-bold text-base">R$ 0,00</span>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded border border-slate-100 text-[10px] font-mono text-slate-600 leading-relaxed break-words">
+                            <span id="log-vvt">...</span>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-orange-500 pl-4">
+                        <div class="flex justify-between items-baseline mb-1">
+                            <span class="font-bold text-slate-700 text-sm">Edificação (VVE)</span>
+                            <span id="res-vve-reais" class="text-orange-600 font-bold text-base">R$ 0,00</span>
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded border border-slate-100 text-[10px] font-mono text-slate-600 leading-relaxed break-words">
+                            <span id="log-vve">...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIMULADOR DE ALÍQUOTA -->
+            <div class="bg-emerald-900 rounded-xl shadow-xl border border-emerald-700 overflow-hidden">
+                <div class="p-4 border-b border-emerald-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="calculator" class="w-5 h-5 text-emerald-300"></i>
+                        <h3 class="font-bold text-white text-sm uppercase">Simulador de Alíquota Efetiva</h3>
+                    </div>
+                    <span class="text-[10px] text-emerald-300 font-mono">IPTU / ITBI</span>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-emerald-300 mb-2">Imposto Pretendido (R$)</label>
+                        <input type="number" id="sim-iptu-target"
+                            class="w-full bg-emerald-950/50 border border-emerald-600 text-white font-bold text-xl rounded p-3 focus:ring-2 focus:ring-emerald-400 outline-none placeholder-emerald-700"
+                            placeholder="Ex: 500.00" step="10.00" oninput="calcularSimulacao()">
+                    </div>
+                    <div class="flex flex-col items-center bg-black/20 p-4 rounded-lg border border-emerald-800">
+                        <span class="text-xs text-emerald-200 uppercase font-bold mb-1">Alíquota Efetiva Correspondente</span>
+                        <span id="res-aliquota" class="text-3xl font-black text-white">0.00%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Guia Técnico -->
+<div id="modal-tutorial" class="hidden fixed inset-0 bg-black/60 z-[110] flex justify-center items-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-slate-200">
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+            <h3 class="font-black text-slate-800 text-base flex items-center gap-2">
+                <i data-lucide="book-open" class="w-5 h-5 text-yellow-500"></i> Guia Técnico de Avaliação
+            </h3>
+            <button onclick="closeTutorial()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+        </div>
+        <div class="text-xs space-y-3 text-slate-600 leading-relaxed">
+            <p><strong>Unidade Padrão Fiscal:</strong> Para o exercício de 2026, adota-se a UPFM no valor de <strong>R$ 30,90</strong>, conforme o ato normativo vigente.</p>
+            <p><strong>Valor Venal do Terreno (VVT):</strong> No modo com fatores corretivos, é apurado pela área tributável multiplicada pelo valor do m² do setor e pelos fatores de pavimentação e topografia: <code>VVT = A_trib &times; V_m² &times; Kpav &times; Kd</code>. No modo sem fatores corretivos, considera-se a área total do terreno.</p>
+            <p><strong>Valor Venal da Edificação (VVE):</strong> É apurado pela área construída multiplicada pelo valor unitário da tipologia e do estado de conservação, expresso em UPFM/m², convertido em moeda corrente pela UPFM vigente: <code>VVE = A_c &times; (UPFM/m² &times; valor vigente da UPFM)</code>.</p>
+        </div>
+        <button onclick="closeTutorial()" class="w-full mt-5 bg-slate-900 text-white font-bold py-2 rounded text-xs">Entendido</button>
+    </div>
+</div>
+
+<!-- Modal Minuta -->
+<div id="modal-minuta" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-start overflow-y-auto py-10 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-[21cm] shadow-2xl relative mb-10">
+        <div class="no-print absolute top-4 right-4 flex gap-2">
+            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-xs font-bold">IMPRIMIR</button>
+            <button onclick="document.getElementById('modal-minuta').classList.add('hidden')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded text-xs font-bold">FECHAR</button>
+        </div>
+        <div id="conteudo-juridico" class="juridico-doc"></div>
+    </div>
+</div>
+
+<script>
+    const VALOR_UPFM = 30.90;
+    proj4.defs("EPSG:31981", "+proj=utm +zone=21 +south +datum=SIRGAS2000 +units=m +no_defs");
+
+    let totalVenalGlobal = 0;
+    let mapa, geojsonLayer;
+    let COR_POR_GRUPO = {};
+    let LAYERS_POR_GRUPO = {};
+    let SETORES = [];
+    let usarFatoresCorretivos = true;
+
+    const TABELA_II_EDIF = {
+        res_alv: { novo: 7.36, bom: 3.82, regular: 3.61, ruim: 2.52, nome: "Residencial - Alvenaria" },
+        res_mis: { novo: 4.40, bom: 3.06, regular: 2.15, ruim: 1.50, nome: "Residencial - Mista" },
+        res_mad: { novo: 3.29, bom: 2.29, regular: 1.61, ruim: 1.13, nome: "Residencial - Madeira" },
+        bar_alv: { novo: 3.64, bom: 2.54, regular: 1.78, ruim: 1.25, nome: "Barracão - Alvenaria" },
+        bar_mis: { novo: 3.29, bom: 2.29, regular: 1.61, ruim: 1.13, nome: "Barracão - Mista" },
+        bar_mad: { novo: 2.92, bom: 2.04, regular: 1.42, ruim: 0.99, nome: "Barracão - Madeira" },
+        com_alv: { novo: 6.64, bom: 4.65, regular: 3.24, ruim: 2.38, nome: "Comercial / Industrial - Alvenaria" },
+        com_mis: { novo: 5.32, bom: 3.72, regular: 2.61, ruim: 1.82, nome: "Comercial / Industrial - Mista" },
+        com_mad: { novo: 4.38, bom: 3.06, regular: 2.15, ruim: 1.50, nome: "Comercial / Industrial - Madeira" }
+    };
+
+    const PALETA = ["#6366f1", "#f59e0b", "#10b981", "#ef4444", "#3b82f6", "#ec4899", "#8b5cf6", "#14b8a6", "#f97316"];
+
+    function openTutorial() {
+        document.getElementById("modal-tutorial").classList.remove("hidden");
+    }
+
+    function closeTutorial() {
+        document.getElementById("modal-tutorial").classList.add("hidden");
+    }
+
+    function popularSetores() {
+        const sel = document.getElementById("in-setor");
+        if(!sel) return;
+        sel.innerHTML = "";
+        SETORES.sort((a,b) => a.name.localeCompare(b.name, "pt-BR", {numeric:true, sensitivity:"base"})).forEach(s => {
+            const o = document.createElement("option");
+            o.value = s.name;
+            const cor = COR_POR_GRUPO[s.name] || "#6366f1";
+            o.textContent = `${s.name}  (R$ ${s.valor_m2.toFixed(2)}/m²)`;
+            o.style.color = cor;
+            o.style.fontWeight = "bold";
+            sel.appendChild(o);
+        });
+    }
+
+    // Função auxiliar case-insensitive para buscar propriedades (evita problemas de maiúsculas/minúsculas como Layer vs layer)
+    function extrairNomeGrupo(properties) {
+        if (!properties) return "Setor 1";
+        for (const key of Object.keys(properties)) {
+            const k = key.toLowerCase();
+            if (k === 'zona' || k === 'camada_original' || k === 'layer' || k === 'name' || k === 'nome' || k === 'setor') {
+                const val = properties[key];
+                if (val !== undefined && val !== null && String(val).trim() !== "") {
+                    return String(val).trim();
+                }
+            }
+        }
+        return null;
+    }
+
+    function processarSetoresGeoJSON(data) {
+        const mapaSetoresMap = {};
+        
+        data.features.forEach((feature, idx) => {
+            const p = feature.properties || {};
+            let grupo = extrairNomeGrupo(p);
+            
+            // Se não encontrar nenhuma propriedade de nome/layer, atribui um nome único por feição
+            if (!grupo) {
+                grupo = `Setor ${idx + 1}`;
+            }
+
+            if (!mapaSetoresMap[grupo]) {
+                mapaSetoresMap[grupo] = true;
+            }
+        });
+
+        const nomesEncontrados = Object.keys(mapaSetoresMap);
+        SETORES = nomesEncontrados.map((nome, idx) => {
+            const feature = data.features.find(f => (extrairNomeGrupo(f.properties || {}) || `Setor ${idx + 1}`) === nome);
+            const medianaVU = Number(feature?.properties?.mediana_vu);
+            const v_m2 = Number.isFinite(medianaVU) ? medianaVU : 350.00;
+            return { id: nome, name: nome, valor_m2: v_m2 };
+        });
+
+        if (SETORES.length === 0) {
+            SETORES = [
+                { id: "Centro", name: "Centro", valor_m2: 350.00 }
+            ];
+        }
+
+        SETORES.forEach((s, idx) => { COR_POR_GRUPO[s.name] = PALETA[idx % PALETA.length]; });
+        LAYERS_POR_GRUPO = {};
+
+        geojsonLayer = L.geoJSON(data, {
+            style: feature => {
+                const p = feature.properties || {};
+                let grupo = extrairNomeGrupo(p) || "Setor 1";
+                const cor = COR_POR_GRUPO[grupo] || "#6366f1";
+                return { fillColor: cor, weight: 1.5, opacity: 1, color: "white", fillOpacity: 0.5 };
+            },
+            onEachFeature: (feature, layer) => {
+                const p = feature.properties || {};
+                let grupo = extrairNomeGrupo(p) || "Setor 1";
+
+                if (!LAYERS_POR_GRUPO[grupo]) LAYERS_POR_GRUPO[grupo] = [];
+                LAYERS_POR_GRUPO[grupo].push(layer);
+                layer._grupoNome = grupo;
+                layer.on("click", e => {
+                    const sel = document.getElementById("in-setor");
+                    if (sel) {
+                        sel.value = grupo;
+                        destacarGrupo(grupo);
+                        calcular();
+                    }
+                    L.DomEvent.stopPropagation(e);
+                });
+            }
+        }).addTo(mapa);
+
+        popularSetores();
+        atualizarParametrosEdif();
+        calcular();
+        mapa.fitBounds(geojsonLayer.getBounds(), {padding:[15,15]});
+    }
+
+    function normalizarGeoJSONParaMapa(data) {
+        const crsName = data.crs?.properties?.name || "";
+        if (!crsName.includes("31981")) return data;
+
+        const convertido = JSON.parse(JSON.stringify(data));
+        const transformarCoordenadas = coordenadas => {
+            if (typeof coordenadas[0] === "number") {
+                const [lon, lat] = proj4("EPSG:31981", "EPSG:4326", coordenadas);
+                return [lon, lat];
+            }
+            return coordenadas.map(transformarCoordenadas);
+        };
+
+        convertido.features.forEach(feature => {
+            feature.geometry.coordinates = transformarCoordenadas(feature.geometry.coordinates);
+        });
+        convertido.crs = { type: "name", properties: { name: "EPSG:4326" } };
+        return convertido;
+    }
+
+    function initMap() {
+        mapa = L.map("mapa-setores").setView([-10.51, -55.45], 11);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "\u00a9 OpenStreetMap contributors"
+        }).addTo(mapa);
+
+        fetch("setores_valorados_pgv.geojson")
+            .then(r => { if (!r.ok) throw new Error("GeoJSON indisponível"); return r.json(); })
+            .then(data => {
+                processarSetoresGeoJSON(normalizarGeoJSONParaMapa(data));
+            })
+            .catch(err => {
+                console.error("Erro ao carregar setores valorados:", err);
+                SETORES = [
+                    { id: "Centro", name: "Centro", valor_m2: 350.00 }
+                ];
+                SETORES.forEach((s, idx) => { COR_POR_GRUPO[s.name] = PALETA[idx % PALETA.length]; });
+                popularSetores();
+                atualizarParametrosEdif();
+                calcular();
+            });
+    }
+
+    function destacarGrupo(nomeGrupo) {
+        if (!geojsonLayer) return;
+        geojsonLayer.eachLayer(layer => {
+            const g = layer._grupoNome;
+            const cor = COR_POR_GRUPO[g] || "#6366f1";
+            layer.setStyle({ fillColor: cor, fillOpacity: 0.5, color: "white", weight: 1.5 });
+        });
+        const layers = LAYERS_POR_GRUPO[nomeGrupo];
+        if (layers) {
+            layers.forEach(layer => {
+                layer.setStyle({ fillColor: COR_POR_GRUPO[nomeGrupo] || "#4f46e5", fillOpacity: 0.85, color: "#1e293b", weight: 3 });
+                layer.bringToFront();
+            });
+        }
+    }
+
+    function syncMapFromSelect() {
+        const el = document.getElementById("in-setor");
+        if (el) destacarGrupo(el.value);
+    }
+
+    function alternarFatores() {
+        usarFatoresCorretivos = document.getElementById("toggle-fatores").checked;
+        document.getElementById("fatores-corretivos-panel").classList.toggle("hidden", !usarFatoresCorretivos);
+        document.getElementById("gleba-panel").classList.toggle("hidden", !usarFatoresCorretivos);
+        calcular();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        if (typeof lucide !== "undefined") lucide.createIcons();
+        initMap();
+    });
+
+    const getVal = id => {
+        const el = document.getElementById(id);
+        if(!el) return 0;
+        return parseFloat(el.value.replace(",", ".")) || 0;
+    };
+    const fmtMoney = v => v.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+    const fmtNum = v => v.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    function atualizarParametrosEdif() {
+        const tipoKey = document.getElementById("in-tipo-edif").value;
+        const estKey = document.getElementById("in-conservacao").value;
+        const upfmVal = TABELA_II_EDIF[tipoKey][estKey] || 3.82;
+        const reaisM2 = upfmVal * VALOR_UPFM;
+
+        document.getElementById("out-vuc-upfm").textContent = upfmVal.toFixed(2);
+        document.getElementById("out-vuc-reais").textContent = fmtMoney(reaisM2);
+        return { upfmVal, reaisM2 };
+    }
+
+    function calcular() {
+        const selSetor = document.getElementById("in-setor");
+        if(!selSetor) return;
+        const setorNome = selSetor.value;
+        const setorData = SETORES.find(s => s.name === setorNome) || SETORES[0] || {valor_m2: 350.00};
+        const vm2 = setorData.valor_m2;
+        const vm2UPFM = vm2 / VALOR_UPFM;
+
+        document.getElementById("out-valor-setor").textContent = fmtMoney(vm2);
+        document.getElementById("out-upfm-m2").textContent = `${vm2UPFM.toFixed(2)} UPFM`;
+
+        const kpav = usarFatoresCorretivos ? getVal("in-pav") : 1.00;
+        const kd = usarFatoresCorretivos ? getVal("in-kd") : 1.00;
+        const vm2corrigido = vm2 * kpav * kd;
+
+        const at = getVal("in-at");
+        let fatorGleba = 1.00;
+        let msgG = "Até 5.000 m²";
+
+        if (usarFatoresCorretivos && at > 10000) {
+            fatorGleba = 0.60;
+            msgG = "Acima de 10.000 m²";
+        } else if (usarFatoresCorretivos && at > 8000) {
+            fatorGleba = 0.70;
+            msgG = "De 8.001 a 10.000 m²";
+        } else if (usarFatoresCorretivos && at > 6000) {
+            fatorGleba = 0.75;
+            msgG = "De 6.001 a 8.000 m²";
+        } else if (usarFatoresCorretivos && at > 5000) {
+            fatorGleba = 0.85;
+            msgG = "De 5.001 a 6.000 m²";
+        } else if (!usarFatoresCorretivos) {
+            msgG = "Sem fator de gleba";
+        }
+
+        const att = at * fatorGleba;
+        document.getElementById("out-fator-gleba").textContent = fatorGleba.toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById("gleba-msg").textContent = msgG;
+        document.getElementById("out-att").textContent = `${fmtNum(att)} m²`;
+
+        const vvt = att * vm2corrigido;
+
+        const ac = getVal("in-ac");
+        const { reaisM2, upfmVal } = atualizarParametrosEdif();
+        const vve = ac * reaisM2;
+
+        const total = vvt + vve;
+        totalVenalGlobal = total;
+
+        document.getElementById("res-total-reais").textContent = fmtMoney(total);
+        document.getElementById("res-total-upfm").textContent = `${fmtNum(total / VALOR_UPFM)} UPFM`;
+
+        document.getElementById("res-vvt-reais").textContent = fmtMoney(vvt);
+        document.getElementById("log-vvt").innerHTML = usarFatoresCorretivos
+            ? `A<sub>trib</sub> ${fmtNum(att)}m² &times; V<sub>m²</sub> ${fmtMoney(vm2)} &times; K<sub>pav</sub> ${kpav.toFixed(2)} &times; K<sub>d</sub> ${kd.toFixed(2)} = <strong>${fmtMoney(vvt)}</strong>`
+            : `Área ${fmtNum(att)}m² &times; V<sub>m²</sub> ${fmtMoney(vm2)} = <strong>${fmtMoney(vvt)}</strong>`;
+
+        document.getElementById("res-vve-reais").textContent = fmtMoney(vve);
+        document.getElementById("log-vve").innerHTML = `Área ${fmtNum(ac)}m² &times; Padrão ${upfmVal.toFixed(2)} UPFM (${fmtMoney(reaisM2)}/m²) = <strong>${fmtMoney(vve)}</strong>`;
+
+        calcularSimulacao();
+    }
+
+    function calcularSimulacao() {
+        const t = getVal("sim-iptu-target");
+        const el = document.getElementById("res-aliquota");
+        if(el) el.textContent = (totalVenalGlobal > 0 && t > 0) ? `${((t / totalVenalGlobal) * 100).toFixed(4)}%` : "0.00%";
+    }
+
+    function gerarMinuta() {
+        let rowsTerrenos = "";
+        SETORES.forEach(s => {
+            const upfmEquiv = (s.valor_m2 / VALOR_UPFM).toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            rowsTerrenos += `<tr><td>${s.name}</td><td>R$ ${fmtNum(s.valor_m2)}</td><td>${upfmEquiv} UPFM</td></tr>`;
+        });
+        const modoSemFatores = !usarFatoresCorretivos;
+
+        const html = `
+            <div class="juridico-header">
+                <h1>MUNICÍPIO DE PEIXOTO DE AZEVEDO</h1>
+                <p>ESTADO DE MATO GROSSO</p>
+                <h2 style="margin-top:12px; border:none;">PROJETO DE LEI Nº ___/2026</h2>
+            </div>
+            <div class="ementa">Institui a Planta Genérica de Valores (PGV) do Município de Peixoto de Azevedo, estabelece os valores unitários do metro quadrado de terreno por zona, define os critérios de cálculo dos valores venais dos terrenos e das edificações e dá outras providências.</div>
+            
+            <p>O <strong>PREFEITO DO MUNICÍPIO DE PEIXOTO DE AZEVEDO</strong>, Estado de Mato Grosso, no uso de suas atribuições legais, submete à apreciação da Câmara Municipal o seguinte Projeto de Lei:</p>
+            
+            <h2>CAPÍTULO I<br>DO OBJETO E DA BASE DE CÁLCULO</h2>
+            <p class="artigo">Art. 1º. Fica instituída a Planta Genérica de Valores (PGV) do Município de Peixoto de Azevedo, composta pelos valores unitários do metro quadrado de terreno por zona e pelos critérios de avaliação das edificações constantes dos anexos desta Lei.</p>
+            <p style="text-indent: 0; padding-left: 2.5cm;"><strong>Parágrafo único.</strong> Para os fins desta Lei, considera-se zona a porção do território urbano identificada no Anexo I, à qual corresponde valor unitário próprio do metro quadrado de terreno.</p>
+            <p class="artigo">Art. 2º. Para os efeitos desta Lei, adota-se o valor da Unidade Padrão Fiscal Municipal (UPFM) fixado no ato normativo específico vigente, aplicável à apuração dos valores venais e dos créditos tributários municipais.</p>
+            <p class="artigo">Art. 3º. O Valor Venal do Imóvel (VVI) é apurado pela soma do Valor Venal do Terreno (VVT) com o Valor Venal da Edificação (VVE):</p>
+            <p style="text-align:center; font-family:monospace; font-weight:bold; margin: 10px 0;">VVI = VVT + VVE</p>
+
+            <h2>CAPÍTULO II<br>DA VALORAÇÃO DO TERRENO (VVT)</h2>
+            <p class="artigo">Art. 4º. O Valor Venal do Terreno (VVT) será calculado pela aplicação da seguinte fórmula:</p>
+            <p style="text-align:center; font-family:monospace; font-weight:bold; margin: 10px 0;">${modoSemFatores ? 'VVT = Área Total &times; V<sub>m²t</sub>' : 'VVT = Área Tributável &times; V<sub>m²t</sub> &times; K<sub>pav</sub> &times; K<sub>d</sub>'}</p>
+            <p style="text-indent: 0; padding-left: 2.5cm;"><strong>Onde:</strong></p>
+            <ul style="margin-left: 3.5cm; margin-bottom: 15px; list-style-type: none;">
+                <li>I - <strong>${modoSemFatores ? 'Área Total' : 'Área Tributável'}</strong>: ${modoSemFatores ? 'área total do terreno;' : 'área total do terreno multiplicada pelo fator de gleba, quando aplicável;'}</li>
+                <li>II - <strong>V<sub>m²t</sub></strong>: valor unitário do metro quadrado de terreno da zona, conforme o Anexo I;</li>
+                ${modoSemFatores ? '' : '<li>III - <strong>K<sub>pav</sub></strong>: fator de pavimentação, conforme o Anexo II;</li><li>IV - <strong>K<sub>d</sub></strong>: fator de topografia, conforme o Anexo II.</li>'}
+            </ul>
+            <p class="artigo">Art. 5º. O valor unitário do metro quadrado de terreno (V<sub>m²t</sub>) corresponde ao valor definido para a zona no Anexo I desta Lei.</p>
+            ${modoSemFatores ? '' : '<p class="artigo">Art. 6º. A área tributável e os fatores de correção serão determinados conforme os critérios e as faixas definidos no Anexo II desta Lei.</p>'}
+
+            <h2>CAPÍTULO III<br>DA VALORAÇÃO DA EDIFICAÇÃO (VVE)</h2>
+            <p class="artigo">Art. ${modoSemFatores ? '6' : '7'}º. O Valor Venal da Edificação (VVE) será calculado pelo produto da área construída pelo valor unitário, expresso em UPFM/m², correspondente à tipologia e ao estado de conservação, conforme a Tabela constante do Anexo III desta Lei:</p>
+            <p style="text-align:center; font-family:monospace; font-weight:bold; margin: 10px 0;">VVE = Área Construída &times; (UPFM/m² &times; valor vigente da UPFM)</p>
+            <p class="artigo">Art. ${modoSemFatores ? '7' : '8'}º. As tipologias construtivas, os valores unitários em UPFM/m² e os estados de conservação são os constantes do Anexo III desta Lei.</p>
+
+            <h2>CAPÍTULO IV<br>DOS ANEXOS</h2>
+            <p class="artigo">Art. ${modoSemFatores ? '8' : '9'}º. Integram esta Lei, como partes integrantes da PGV:</p>
+            <ul style="margin-left: 3.5cm; margin-bottom: 15px; list-style-type: none;">
+                <li>I - Anexo I: valores unitários do metro quadrado de terreno por zona;</li>
+                <li>II - Anexo II: ${modoSemFatores ? 'valor do terreno;' : 'fatores de correção e critérios de cálculo da área tributável;'}</li>
+                <li>III - Anexo III: tabela de valores unitários de construção e estados de conservação.</li>
+            </ul>
+
+            <div style="margin-top:35px; text-align:center;">Gabinete do Prefeito Municipal de Peixoto de Azevedo/MT.</div>
+            <div style="margin-top:40px; text-align:center; border-top:1px solid #000; width:60%; margin-left:auto; margin-right:auto; padding-top:5px; margin-bottom:25px;">
+                <strong>Nilmar Nunes de Miranda</strong><br>Prefeito Municipal
+            </div>
+
+            <div style="page-break-before: always;"></div>
+            <h2>ANEXO I - VALORES VENAIS DE REFERÊNCIA DE TERRENOS</h2>
+            <table class="juridico-table">
+                <thead><tr><th>ZONA / SETOR</th><th>VALOR DO M² (R$)</th><th>EQUIVALÊNCIA (UPFM)</th></tr></thead>
+                <tbody>${rowsTerrenos}</tbody>
+            </table>
+            <p style="text-indent:0;font-size:10pt;"><em>Nota: os valores e as equivalências deste Anexo I foram calculados considerando a Unidade Padrão Fiscal Municipal (UPFM) do exercício de 2026, no valor de ${fmtMoney(VALOR_UPFM)}.</em></p>
+
+            ${modoSemFatores ? '<h2 style="margin-top:25px;">ANEXO II - VALOR DO TERRENO</h2><p style="text-indent:0;font-size:10pt;"><em>Para o cálculo do VVT, considera-se a área total do terreno multiplicada pelo valor unitário do metro quadrado da zona.</em></p>' : ''}
+            <div style="${modoSemFatores ? 'display:none;' : ''}">
+            <h2 style="margin-top:25px;">ANEXO II - FATORES DE CORREÇÃO E CRITÉRIOS DA ÁREA TRIBUTÁVEL (EXERCÍCIO 2026)</h2>
+            <table class="juridico-table">
+                <thead><tr><th>FATOR DE PAVIMENTAÇÃO (K<sub>pav</sub>)</th><th>VALOR DO FATOR</th></tr></thead>
+                <tbody>
+                    <tr><td>Asfalto</td><td>1,00</td></tr>
+                    <tr><td>Paralelepípedo / Bloco</td><td>0,90</td></tr>
+                    <tr><td>Sem pavimentação / Leito Natural</td><td>0,80</td></tr>
+                </tbody>
+            </table>
+            <table class="juridico-table">
+                <thead><tr><th>FATOR DE TOPOGRAFIA (K<sub>d</sub>)</th><th>VALOR DO FATOR</th></tr></thead>
+                <tbody>
+                    <tr><td>Plano (0 a 3%)</td><td>1,00</td></tr>
+                    <tr><td>Suave ondulado (3 a 8%)</td><td>0,95</td></tr>
+                    <tr><td>Ondulado (8 a 20%)</td><td>0,90</td></tr>
+                    <tr><td>Forte ondulado (20 a 45%)</td><td>0,85</td></tr>
+                    <tr><td>Montanhoso (45 a 75%)</td><td>0,80</td></tr>
+                    <tr><td>Escarpado (&gt; 75%)</td><td>0,70</td></tr>
+                </tbody>
+            </table>
+            <p style="text-indent:0;font-size:10pt;"><strong>CRITÉRIOS DE GLEBA</strong></p>
+            <table class="juridico-table">
+                <thead><tr><th>ÁREA TOTAL DO TERRENO</th><th>FATOR DE GLEBA</th><th>ÁREA TRIBUTÁVEL RESULTANTE</th></tr></thead>
+                <tbody>
+                    <tr><td>Até 5.000 m²</td><td>1,00</td><td>Área total × 1,00</td></tr>
+                    <tr><td>De 5.001 m² a 6.000 m²</td><td>0,85</td><td>Área total × 0,85</td></tr>
+                    <tr><td>De 6.001 m² a 8.000 m²</td><td>0,75</td><td>Área total × 0,75</td></tr>
+                    <tr><td>De 8.001 m² a 10.000 m²</td><td>0,70</td><td>Área total × 0,70</td></tr>
+                    <tr><td>Acima de 10.000 m²</td><td>0,60</td><td>Área total × 0,60</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h2 style="margin-top:25px;">ANEXO III - TABELA DE PADRÕES CONSTRUTIVOS (EXERCÍCIO 2026)</h2>
+            <p style="text-indent:0;font-size:10pt;"><em>Os valores abaixo estão expressos em UPFM/m². Para o exercício de 2026, considera-se a UPFM no valor de ${fmtMoney(VALOR_UPFM)}.</em></p>
+            <table class="juridico-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">TIPO DE EDIFICAÇÃO</th>
+                        <th colspan="4">VALOR POR M², EM UPFM, CONFORME O ESTADO DE CONSERVAÇÃO</th>
+                    </tr>
+                    <tr>
+                        <th>Novo / Ótimo</th>
+                        <th>Bom</th>
+                        <th>Regular</th>
+                        <th>Ruim</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Residencial - Alvenaria</td><td>7,36 UPFM</td><td>3,82 UPFM</td><td>3,61 UPFM</td><td>2,52 UPFM</td></tr>
+                    <tr><td>Residencial - Mista</td><td>4,40 UPFM</td><td>3,06 UPFM</td><td>2,15 UPFM</td><td>1,50 UPFM</td></tr>
+                    <tr><td>Residencial - Madeira</td><td>3,29 UPFM</td><td>2,29 UPFM</td><td>1,61 UPFM</td><td>1,13 UPFM</td></tr>
+                    <tr><td>Barracão - Alvenaria</td><td>3,64 UPFM</td><td>2,54 UPFM</td><td>1,78 UPFM</td><td>1,25 UPFM</td></tr>
+                    <tr><td>Barracão - Mista</td><td>3,29 UPFM</td><td>2,29 UPFM</td><td>1,61 UPFM</td><td>1,13 UPFM</td></tr>
+                    <tr><td>Barracão - Madeira</td><td>2,92 UPFM</td><td>2,04 UPFM</td><td>1,42 UPFM</td><td>0,99 UPFM</td></tr>
+                    <tr><td>Comercial/Industrial - Alvenaria</td><td>6,64 UPFM</td><td>4,65 UPFM</td><td>3,24 UPFM</td><td>2,38 UPFM</td></tr>
+                    <tr><td>Comercial/Industrial - Mista</td><td>5,32 UPFM</td><td>3,72 UPFM</td><td>2,61 UPFM</td><td>1,82 UPFM</td></tr>
+                    <tr><td>Comercial/Industrial - Madeira</td><td>4,38 UPFM</td><td>3,06 UPFM</td><td>2,15 UPFM</td><td>1,50 UPFM</td></tr>
+                </tbody>
+            </table>
+            <p style="font-size:9pt; text-align:right; font-style:italic;">Indexador: UPFM conforme valor estabelecido no decreto específico vigente.</p>`;
+
+        document.getElementById("conteudo-juridico").innerHTML = html;
+        document.getElementById("modal-minuta").classList.remove("hidden");
+    }
+</script>
+</body>
+</html>

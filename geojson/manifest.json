@@ -1,0 +1,409 @@
+{
+  "source": "C:\\Users\\freit\\Documents\\peixoto\\8be78050_MAPA TRIBUTAÇÃO 2021 (1)_georef.geojson",
+  "layers": 67,
+  "total_features": 35597,
+  "files": [
+    {
+      "layer": "Lote",
+      "file": "lote.geojson",
+      "features": 5586,
+      "size_mb": 1.628
+    },
+    {
+      "layer": "LOTES_LINHAS",
+      "file": "lotes_linhas.geojson",
+      "features": 4469,
+      "size_mb": 0.988
+    },
+    {
+      "layer": "Fluxo",
+      "file": "fluxo.geojson",
+      "features": 4021,
+      "size_mb": 0.861
+    },
+    {
+      "layer": "0 - Linhas Quadras",
+      "file": "0_linhas_quadras.geojson",
+      "features": 3565,
+      "size_mb": 0.81
+    },
+    {
+      "layer": "vista",
+      "file": "vista.geojson",
+      "features": 2712,
+      "size_mb": 0.776
+    },
+    {
+      "layer": "0 - Divisão rela",
+      "file": "0_divisao_rela.geojson",
+      "features": 1894,
+      "size_mb": 0.429
+    },
+    {
+      "layer": "PDF_REGIAO_POLILINHAS",
+      "file": "pdf_regiao_polilinhas.geojson",
+      "features": 1836,
+      "size_mb": 0.434
+    },
+    {
+      "layer": "quadras",
+      "file": "quadras.geojson",
+      "features": 1073,
+      "size_mb": 0.249
+    },
+    {
+      "layer": "PDF_Boundary-Lotes",
+      "file": "pdf_boundary_lotes.geojson",
+      "features": 1023,
+      "size_mb": 0.409
+    },
+    {
+      "layer": "Calçada",
+      "file": "calcada.geojson",
+      "features": 889,
+      "size_mb": 0.208
+    },
+    {
+      "layer": "0 - MEIO FIO 2",
+      "file": "0_meio_fio_2.geojson",
+      "features": 751,
+      "size_mb": 0.176
+    },
+    {
+      "layer": "Lotes_Existentes",
+      "file": "lotes_existentes.geojson",
+      "features": 749,
+      "size_mb": 0.171
+    },
+    {
+      "layer": "Lotes_Boundary",
+      "file": "lotes_boundary.geojson",
+      "features": 592,
+      "size_mb": 0.223
+    },
+    {
+      "layer": "divisórias",
+      "file": "divisorias.geojson",
+      "features": 541,
+      "size_mb": 0.12
+    },
+    {
+      "layer": "0 - Meio Fio",
+      "file": "0_meio_fio.geojson",
+      "features": 443,
+      "size_mb": 0.099
+    },
+    {
+      "layer": "PDF_LAGO",
+      "file": "pdf_lago.geojson",
+      "features": 438,
+      "size_mb": 0.096
+    },
+    {
+      "layer": "REGIAO_POLILINHAS",
+      "file": "regiao_polilinhas.geojson",
+      "features": 410,
+      "size_mb": 0.093
+    },
+    {
+      "layer": "LOTES_Q-54",
+      "file": "lotes_q_54.geojson",
+      "features": 363,
+      "size_mb": 0.08
+    },
+    {
+      "layer": "MEIO_FIO",
+      "file": "meio_fio.geojson",
+      "features": 311,
+      "size_mb": 0.069
+    },
+    {
+      "layer": "LOTES_Q-53",
+      "file": "lotes_q_53.geojson",
+      "features": 301,
+      "size_mb": 0.067
+    },
+    {
+      "layer": "LOTES_Q-52",
+      "file": "lotes_q_52.geojson",
+      "features": 287,
+      "size_mb": 0.064
+    },
+    {
+      "layer": "0",
+      "file": "0.geojson",
+      "features": 285,
+      "size_mb": 0.061
+    },
+    {
+      "layer": "PDF_Meio-Fio",
+      "file": "pdf_meio_fio.geojson",
+      "features": 240,
+      "size_mb": 0.06
+    },
+    {
+      "layer": "LOTES_Q-49",
+      "file": "lotes_q_49.geojson",
+      "features": 237,
+      "size_mb": 0.053
+    },
+    {
+      "layer": "0 - LINHAS DE QUADRA E LOTES",
+      "file": "0_linhas_de_quadra_e_lotes.geojson",
+      "features": 234,
+      "size_mb": 0.056
+    },
+    {
+      "layer": "COTAS",
+      "file": "cotas.geojson",
+      "features": 203,
+      "size_mb": 0.055
+    },
+    {
+      "layer": "0 - DIVISÃO DOS TERRENOS",
+      "file": "0_divisao_dos_terrenos.geojson",
+      "features": 172,
+      "size_mb": 0.041
+    },
+    {
+      "layer": "LOTES_Q-51",
+      "file": "lotes_q_51.geojson",
+      "features": 139,
+      "size_mb": 0.031
+    },
+    {
+      "layer": "verde",
+      "file": "verde.geojson",
+      "features": 139,
+      "size_mb": 0.03
+    },
+    {
+      "layer": "Lado_Lotes",
+      "file": "lado_lotes.geojson",
+      "features": 123,
+      "size_mb": 0.028
+    },
+    {
+      "layer": "EL",
+      "file": "el.geojson",
+      "features": 122,
+      "size_mb": 0.026
+    },
+    {
+      "layer": "LOTES_Q-50",
+      "file": "lotes_q_50.geojson",
+      "features": 121,
+      "size_mb": 0.027
+    },
+    {
+      "layer": "PDF_MEIO_FIO",
+      "file": "pdf_meio_fio_2.geojson",
+      "features": 118,
+      "size_mb": 0.03
+    },
+    {
+      "layer": "0 - Cotas",
+      "file": "0_cotas.geojson",
+      "features": 116,
+      "size_mb": 0.03
+    },
+    {
+      "layer": "LOTES_Q-28",
+      "file": "lotes_q_28.geojson",
+      "features": 111,
+      "size_mb": 0.025
+    },
+    {
+      "layer": "EIXO_LOTES",
+      "file": "eixo_lotes.geojson",
+      "features": 107,
+      "size_mb": 0.024
+    },
+    {
+      "layer": "NUMERO_DOS_LOTES",
+      "file": "numero_dos_lotes.geojson",
+      "features": 102,
+      "size_mb": 0.162
+    },
+    {
+      "layer": "CORREGO",
+      "file": "corrego.geojson",
+      "features": 94,
+      "size_mb": 0.021
+    },
+    {
+      "layer": "Nº. quadra",
+      "file": "n_quadra.geojson",
+      "features": 93,
+      "size_mb": 0.147
+    },
+    {
+      "layer": "PERIMETRO",
+      "file": "perimetro.geojson",
+      "features": 68,
+      "size_mb": 0.034
+    },
+    {
+      "layer": "PDF_LINHA_TRANSMISSAO",
+      "file": "pdf_linha_transmissao.geojson",
+      "features": 57,
+      "size_mb": 0.014
+    },
+    {
+      "layer": "Boundary_Lotes",
+      "file": "boundary_lotes.geojson",
+      "features": 55,
+      "size_mb": 0.022
+    },
+    {
+      "layer": "0 - IPTU",
+      "file": "0_iptu.geojson",
+      "features": 50,
+      "size_mb": 0.011
+    },
+    {
+      "layer": "PDF_Numeração_Quadras",
+      "file": "pdf_numeracao_quadras.geojson",
+      "features": 48,
+      "size_mb": 0.077
+    },
+    {
+      "layer": "0 - Número de Quadra",
+      "file": "0_numero_de_quadra.geojson",
+      "features": 46,
+      "size_mb": 0.073
+    },
+    {
+      "layer": "PDF_CORREGO",
+      "file": "pdf_corrego.geojson",
+      "features": 38,
+      "size_mb": 0.009
+    },
+    {
+      "layer": "MF",
+      "file": "mf.geojson",
+      "features": 31,
+      "size_mb": 0.007
+    },
+    {
+      "layer": "Lotes_Novos",
+      "file": "lotes_novos.geojson",
+      "features": 29,
+      "size_mb": 0.007
+    },
+    {
+      "layer": "Poligonal_1a_Ordem",
+      "file": "poligonal_1a_ordem.geojson",
+      "features": 23,
+      "size_mb": 0.006
+    },
+    {
+      "layer": "PDF_IDENT_DAS_QUADRAS",
+      "file": "pdf_ident_das_quadras.geojson",
+      "features": 18,
+      "size_mb": 0.029
+    },
+    {
+      "layer": "q",
+      "file": "q.geojson",
+      "features": 18,
+      "size_mb": 0.005
+    },
+    {
+      "layer": "PDF_EIXO_LOTES",
+      "file": "pdf_eixo_lotes.geojson",
+      "features": 16,
+      "size_mb": 0.006
+    },
+    {
+      "layer": "Perimetro_Georreferenciado",
+      "file": "perimetro_georreferenciado.geojson",
+      "features": 13,
+      "size_mb": 0.004
+    },
+    {
+      "layer": "0 - CÓRREGO",
+      "file": "0_corrego.geojson",
+      "features": 11,
+      "size_mb": 0.003
+    },
+    {
+      "layer": "AREA SEM OCUPACAO",
+      "file": "area_sem_ocupacao.geojson",
+      "features": 9,
+      "size_mb": 0.003
+    },
+    {
+      "layer": "0 - QUADRAS",
+      "file": "0_quadras.geojson",
+      "features": 8,
+      "size_mb": 0.013
+    },
+    {
+      "layer": "IDENT_DAS_QUADRAS",
+      "file": "ident_das_quadras.geojson",
+      "features": 7,
+      "size_mb": 0.012
+    },
+    {
+      "layer": "PDF_Vértices_Quadras",
+      "file": "pdf_vertices_quadras.geojson",
+      "features": 7,
+      "size_mb": 0.003
+    },
+    {
+      "layer": "Defpoints",
+      "file": "defpoints.geojson",
+      "features": 6,
+      "size_mb": 0.002
+    },
+    {
+      "layer": "Destaque_Lote_01A",
+      "file": "destaque_lote_01a.geojson",
+      "features": 6,
+      "size_mb": 0.002
+    },
+    {
+      "layer": "Quadra",
+      "file": "quadra.geojson",
+      "features": 5,
+      "size_mb": 0.008
+    },
+    {
+      "layer": "PDF_Perímetro",
+      "file": "pdf_perimetro.geojson",
+      "features": 4,
+      "size_mb": 0.004
+    },
+    {
+      "layer": "POLIGONAL",
+      "file": "poligonal.geojson",
+      "features": 4,
+      "size_mb": 0.002
+    },
+    {
+      "layer": "POLIGONAL IEIPA",
+      "file": "poligonal_ieipa.geojson",
+      "features": 4,
+      "size_mb": 0.002
+    },
+    {
+      "layer": "UNIDADE",
+      "file": "unidade.geojson",
+      "features": 3,
+      "size_mb": 0.001
+    },
+    {
+      "layer": "HACHURA",
+      "file": "hachura.geojson",
+      "features": 2,
+      "size_mb": 0.001
+    },
+    {
+      "layer": "PDF_NOMES_RUAS",
+      "file": "pdf_nomes_ruas.geojson",
+      "features": 1,
+      "size_mb": 0.001
+    }
+  ]
+}
