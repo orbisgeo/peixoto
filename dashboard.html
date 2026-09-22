@@ -491,6 +491,7 @@
                     let centroidAlvo = zoneCentroids[z];
                     let somaPonderada = 0;
                     let somaPesos = 0;
+                    let zonasIdwUsadas = [];
 
                     zonasComDados.forEach(zComDados => {
                         let centroidVizinho = zoneCentroids[zComDados];
@@ -501,6 +502,7 @@
                             let peso = 1 / Math.pow(dist, 2);
                             somaPonderada += medianasZonasComDados[zComDados] * peso;
                             somaPesos += peso;
+                            zonasIdwUsadas.push(zComDados);
                         }
                     });
 
@@ -509,6 +511,7 @@
                         agregacaoZonas[z].vus = [valorIDW];
                         agregacaoZonas[z].imputado = true;
                         agregacaoZonas[z].metodoImputacao = "IDW";
+                        agregacaoZonas[z].zonasIdwUsadas = zonasIdwUsadas;
                     }
                 }
             }
@@ -522,7 +525,9 @@
                     vagos: agregacaoZonas[z].vagos,
                     validadas: agregacaoZonas[z].validadas,
                     imputado: agregacaoZonas[z].imputado,
-                    vus: agregacaoZonas[z].vus
+                    vus: agregacaoZonas[z].vus,
+                    amostras: agregacaoZonas[z].samples,
+                    zonasIdwUsadas: agregacaoZonas[z].zonasIdwUsadas || []
                 };
             }
 
@@ -606,11 +611,17 @@
                     f.properties.edif_validadas = calc.validadas;
                     f.properties.imputado_idw = calc.imputado;
                     f.properties.metodo_val = calc.imputado ? "IDW" : (calc.vus.length > 0 ? "Mediana Direta" : "Sem Dados");
+                    f.properties.amostras_oficiais_ids = calc.amostras.map(amostra => amostra.id);
+                    f.properties.amostras_oficiais_detalhes = calc.amostras;
+                    f.properties.zonas_idw_usadas = calc.zonasIdwUsadas;
                 } else {
                     f.properties.mediana_vu = 0;
                     f.properties.total_validas = 0;
                     f.properties.imputado_idw = false;
                     f.properties.metodo_val = "Sem Dados";
+                    f.properties.amostras_oficiais_ids = [];
+                    f.properties.amostras_oficiais_detalhes = [];
+                    f.properties.zonas_idw_usadas = [];
                 }
             });
 

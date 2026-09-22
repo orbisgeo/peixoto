@@ -512,6 +512,13 @@
         return amostras.map(amostra => `ID ${amostra.id} (${amostra.tipo}, ${amostra.area.toLocaleString("pt-BR")} m², VU ${fmtMoney(amostra.vu)}/m²)`).join("; ");
     }
 
+    function formatarAmostrasOficiais(amostras, fallback) {
+        if (amostras?.length) {
+            return amostras.map(amostra => `ID ${amostra.id} (${amostra.tipo}, VU ${fmtMoney(amostra.vu)}/m², ${amostra.status})`).join("; ");
+        }
+        return fallback.length ? formatarListaAmostras(fallback) : "Nenhuma amostra oficial registrada.";
+    }
+
     function gerarRelatorio() {
         const setores = setoresDadosOriginais?.features || [];
         const zonas = setores.map(feature => extrairNomeGrupo(feature.properties || {}) || "Zona desconhecida");
@@ -531,22 +538,22 @@
             const usadas = porZona[zona] || [];
             const dadosOficiais = dadosValorizacaoPorZona[zona] || {};
             const mediana = Number(dadosOficiais.mediana_vu);
-            const quantidadeOficial = Number(dadosOficiais.lotes_vagos) || 0;
+            const amostrasOficiais = Array.isArray(dadosOficiais.amostras_oficiais_detalhes) ? dadosOficiais.amostras_oficiais_detalhes : [];
+            const quantidadeOficial = Array.isArray(dadosOficiais.amostras_oficiais_ids) ? dadosOficiais.amostras_oficiais_ids.length : (Number(dadosOficiais.lotes_vagos) || 0);
             let origem = dadosOficiais.metodo_val === "IDW" ? "IDW com mediana das zonas adjacentes" : "Mediana direta da valoração oficial";
             let vizinhas = "Não se aplica";
             let valor = mediana;
             if (dadosOficiais.metodo_val === "IDW") {
-                const candidatas = Object.keys(medianas).filter(nome => centros[zona] && centros[nome]);
-                candidatas.sort((a, b) => distancia(centros[zona], centros[a]) - distancia(centros[zona], centros[b]));
-                const usadasVizinhas = candidatas.slice(0, 3);
-                vizinhas = usadasVizinhas.length ? usadasVizinhas.join(", ") : "Nenhuma";
+                vizinhas = Array.isArray(dadosOficiais.zonas_idw_usadas) && dadosOficiais.zonas_idw_usadas.length
+                    ? dadosOficiais.zonas_idw_usadas.join(", ")
+                    : "Consultar exportação anterior do dashboard";
             }
-            return `<tr><td>${zona}</td><td>${quantidadeOficial}</td><td>${formatarListaAmostras(usadas)}</td><td>${Number.isFinite(valor) ? fmtMoney(valor) + "/m²" : "Sem valor"}</td><td>${origem}</td><td>${vizinhas}</td></tr>`;
+            return `<tr><td>${zona}</td><td>${quantidadeOficial}</td><td>${formatarAmostrasOficiais(amostrasOficiais, usadas)}</td><td>${Number.isFinite(valor) ? fmtMoney(valor) + "/m²" : "Sem valor"}</td><td>${origem}</td><td>${vizinhas}</td></tr>`;
         }).join("");
         const amostrasHtml = bancoAmostras.map(amostra => `<tr><td>${amostra.id}</td><td>${amostra.zona}</td><td>${amostra.tipo}</td><td>${amostra.area ? amostra.area.toLocaleString("pt-BR") : "-"}</td><td>${Number.isFinite(amostra.valor) ? fmtMoney(amostra.valor) : "-"}</td><td>${Number.isFinite(amostra.vu) ? fmtMoney(amostra.vu) + "/m²" : "-"}</td><td>${amostra.status}</td></tr>`).join("");
         document.getElementById("conteudo-relatorio").innerHTML = `<div class="juridico-header"><h1>RELATÓRIO TÉCNICO DE AVALIAÇÃO</h1><p>Planta Genérica de Valores - Peixoto de Azevedo/MT</p><p>Exercício 2026</p></div>
             <h2>1. OBJETIVO E BASE DE DADOS</h2><p>Este relatório documenta a metodologia de cálculo dos valores unitários de terreno, a associação das amostras às zonas e o tratamento das zonas sem amostras próprias. Foram utilizadas ${bancoAmostras.length} amostras carregadas do banco amostras2.geojson e ${zonas.length} zonas do arquivo setores_valorados_pgv.geojson.</p>
-            <h2>2. METODOLOGIA</h2><p>O relatório reproduz a valoração oficial já carregada pela aplicação no arquivo setores_valorados_pgv.geojson. Para cada zona, o valor adotado é o campo mediana_vu, e a origem é o campo metodo_val. Os campos lotes_vagos, total_validas e edif_validadas documentam a composição da valoração oficial.</p><p>As amostras do banco amostras2.geojson são associadas espacialmente às zonas para documentação e conferência. O VU de referência de cada registro é apresentado como valor do imóvel ÷ área do terreno, com conversão de valores inferiores a R$ 10.000,00 para a escala integral em reais; essa associação não substitui o mediana_vu oficial.</p><p>Nas zonas cujo metodo_val é IDW, o relatório lista as zonas adjacentes com dados que integram a estimativa oficial. Na calculadora, o VVT é obtido por VVT = área tributável × mediana_vu × Kpav × Kd. Quando o toggle de fatores está desligado, a área total e os fatores unitários 1,00 são utilizados. O VVE é calculado pela área construída × valor da Tabela II em UPFM/m² × UPFM vigente de R$ 30,90.</p>
+            <h2>2. METODOLOGIA</h2><p>A valoração deste relatório é a mesma executada pelo dashboard: carregamento do banco amostras2.geojson e do zoneamento setores220926.geojson; padronização das tipologias; filtragem dos outliers brutos; associação espacial das amostras às zonas; validação estatística por zona; demolição estatística das edificações; e imputação IDW para zonas sem amostras válidas.</p><p>O resultado oficial exportado pelo dashboard é preservado em setores_valorados_pgv.geojson. Para cada zona, o valor adotado é mediana_vu, a origem é metodo_val, e os IDs/detalhes das amostras realmente usadas são amostras_oficiais_ids e amostras_oficiais_detalhes. Para zonas IDW, zonas_idw_usadas registra exatamente as zonas que participaram da estimativa.</p><p>Na calculadora, o VVT é obtido por VVT = área tributável × mediana_vu × Kpav × Kd. Quando o toggle de fatores está desligado, a área total e os fatores unitários 1,00 são utilizados. O VVE é calculado pela área construída × valor da Tabela II em UPFM/m² × UPFM vigente de R$ 30,90.</p>
             <h2>3. RESULTADO POR ZONA</h2><table class="juridico-table"><thead><tr><th>Zona</th><th>Amostras oficiais</th><th>Amostras associadas para conferência</th><th>Valor oficial adotado</th><th>Origem</th><th>Zonas adjacentes usadas</th></tr></thead><tbody>${linhas}</tbody></table>
             <h2>4. BANCO COMPLETO DE AMOSTRAS</h2><table class="juridico-table"><thead><tr><th>ID</th><th>Zona</th><th>Tipo</th><th>Área (m²)</th><th>Valor</th><th>VU calculado</th><th>Status</th></tr></thead><tbody>${amostrasHtml}</tbody></table>`;
         document.getElementById("modal-relatorio").classList.remove("hidden");
